@@ -80,7 +80,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let onboardingView = OnboardingView { [weak self] in
-            UserDefaults.standard.set(true, forKey: "has_launched_before")
+            AppSettings.shared.hasLaunchedBefore = true
             self?.onboardingWindow?.close()
             self?.onboardingWindow = nil
         }
@@ -169,7 +169,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Model Pre-loading
 
     private func preloadLocalModelIfNeeded() {
-        let mode = TranscriptionMode.fromSaved(UserDefaults.standard.string(forKey: "transcription_mode"))
+        let mode = AppSettings.shared.transcriptionMode
         if mode == .senseVoice {
             SenseVoiceService.shared.preloadModel()
         }
@@ -178,7 +178,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - First Launch
 
     func checkFirstLaunch() {
-        let hasLaunched = UserDefaults.standard.bool(forKey: "has_launched_before")
+        let hasLaunched = AppSettings.shared.hasLaunchedBefore
         if !hasLaunched {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
                 self?.openOnboarding()

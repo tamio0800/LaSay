@@ -7,6 +7,10 @@
 
 import Foundation
 
+/// Centralized UserDefaults wrapper for app-wide settings.
+/// All UserDefaults access should go through this singleton.
+/// Thread-safety: @MainActor ensures main-thread-only access.
+@MainActor
 final class AppSettings {
     static let shared = AppSettings()
     private let defaults = UserDefaults.standard

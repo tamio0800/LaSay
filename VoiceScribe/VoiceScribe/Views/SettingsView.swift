@@ -118,7 +118,7 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.menu)
                 .onChange(of: transcriptionMode) { newValue in
-                    UserDefaults.standard.set(newValue.rawValue, forKey: "transcription_mode")
+                    AppSettings.shared.transcriptionMode = newValue
                     NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
                     if newValue == .senseVoice, !senseVoiceService.isModelLoaded {
                         isLoadingModel = true
@@ -137,7 +137,7 @@ struct SettingsView: View {
                 }
                 .pickerStyle(.menu)
                 .onChange(of: transcriptionLanguage) { newValue in
-                    UserDefaults.standard.set(newValue.rawValue, forKey: "transcription_language")
+                    AppSettings.shared.transcriptionLanguage = newValue
                 }
             }
 
@@ -171,7 +171,7 @@ struct SettingsView: View {
             }
             .pickerStyle(.segmented)
             .onChange(of: punctuationStyle) { newValue in
-                UserDefaults.standard.set(newValue.rawValue, forKey: "punctuation_style")
+                AppSettings.shared.punctuationStyle = newValue
             }
 
             Text(punctuationExample)
@@ -201,7 +201,7 @@ struct SettingsView: View {
                 .accessibilityHint(localization.localized(.toggleAccessibilityHint))
                 .accessibilityValue(enableAIPolish ? "已開啟" : "已關閉")
                 .onChange(of: enableAIPolish) { newValue in
-                    UserDefaults.standard.set(newValue, forKey: "enable_ai_polish")
+                    AppSettings.shared.enableAIPolish = newValue
                     NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
                 }
 
@@ -371,23 +371,11 @@ struct SettingsView: View {
     func loadSettings() {
         loadAPIKey()
 
-        transcriptionMode = TranscriptionMode.fromSaved(UserDefaults.standard.string(forKey: "transcription_mode"))
-
-        if let savedLanguage = UserDefaults.standard.string(forKey: "transcription_language"),
-           let language = TranscriptionLanguage(rawValue: savedLanguage) {
-            transcriptionLanguage = language
-        }
-
-        if let savedPunctuation = UserDefaults.standard.string(forKey: "punctuation_style"),
-           let style = PunctuationStyle(rawValue: savedPunctuation) {
-            punctuationStyle = style
-        }
-
-        enableAIPolish = UserDefaults.standard.bool(forKey: "enable_ai_polish")
-
-        if let savedPrompt = UserDefaults.standard.string(forKey: "custom_system_prompt") {
-            customSystemPrompt = savedPrompt
-        }
+        transcriptionMode = AppSettings.shared.transcriptionMode
+        transcriptionLanguage = AppSettings.shared.transcriptionLanguage
+        punctuationStyle = AppSettings.shared.punctuationStyle
+        enableAIPolish = AppSettings.shared.enableAIPolish
+        customSystemPrompt = AppSettings.shared.customSystemPrompt ?? ""
     }
 
     func loadAPIKey() {
@@ -411,12 +399,12 @@ struct SettingsView: View {
             }
         }
 
-        UserDefaults.standard.set(transcriptionMode.rawValue, forKey: "transcription_mode")
-        UserDefaults.standard.set(transcriptionLanguage.rawValue, forKey: "transcription_language")
-        UserDefaults.standard.set(punctuationStyle.rawValue, forKey: "punctuation_style")
-        UserDefaults.standard.set(enableAIPolish, forKey: "enable_ai_polish")
-        UserDefaults.standard.set(customSystemPrompt, forKey: "custom_system_prompt")
-        UserDefaults.standard.set(true, forKey: "has_launched_before")
+        AppSettings.shared.transcriptionMode = transcriptionMode
+        AppSettings.shared.transcriptionLanguage = transcriptionLanguage
+        AppSettings.shared.punctuationStyle = punctuationStyle
+        AppSettings.shared.enableAIPolish = enableAIPolish
+        AppSettings.shared.customSystemPrompt = customSystemPrompt
+        AppSettings.shared.hasLaunchedBefore = true
 
         NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
     }

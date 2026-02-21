@@ -8,6 +8,7 @@
 import Cocoa
 import SwiftUI
 import UserNotifications
+import AVFoundation
 import os.log
 
 final class RecordingCoordinator {
@@ -136,11 +137,12 @@ final class RecordingCoordinator {
             return
         }
 
-        // 空錄音保護：檔案小於 1KB 視為錄音太短
-        let fileSize = (try? FileManager.default.attributesOfItem(atPath: audioURL.path)[.size] as? Int) ?? 0
-        if fileSize < 1024 {
-            AppLogger.recording.info("RecordingCoordinator: audio file too small (\(fileSize, privacy: .public) bytes), skipping transcription")
-            audioRecorder.deleteRecording(at: audioURL)
+        // 空錄音保護：音訊長度小於 0.5 秒視為錄音太短
+        let asset = AVURLAsset(url: audioURL)
+        let duration = CMTimeGetSeconds(asset.duration)
+        if duration < 0.5 {
+            AppLogger.recording.info("Recording too short: \(duration, privacy: .public)s, deleting")
+            try? FileManager.default.removeItem(at: audioURL)
             showNotification(title: "錄音太短", body: "請按住 Fn+Space 說話，放開後自動辨識")
             appState.updateStatus(.idle)
             return
@@ -231,57 +233,8 @@ final class RecordingCoordinator {
                             // Cloud 模式固定全形標點，不額外加指令拖慢 AI Polish
                             let puncStyle: PunctuationStyle = (selectedMode == .cloud) ? .fullWidth : AppSettings.shared.punctuationStyle
 
-                            // Helper to decide if an error is retryable (network/response errors only)
-                            func isRetryablePolishError(_ err: OpenAIError) -> Bool {
-                                switch err {
-                                case .networkError, .invalidResponse: return true
-                                default: return false
-                                }
-                            }
-
-                            self.openAIService.polishText(transcribedText, customPrompt: customPrompt, punctuationStyle: puncStyle) { [weak self] polishResult in
-                                DispatchQueue.main.async { [weak self] in
-                                    guard let self = self else { return }
-
-                                    switch polishResult {
-                                    case .success(let polishedText):
-                                        AppLogger.transcription.info("RecordingCoordinator: AI Polish succeeded")
-                                        self.processFinalText(polishedText)
-
-                                    case .failure(let firstError) where isRetryablePolishError(firstError):
-                                        // Retry once for transient errors
-                                        AppLogger.transcription.info("RecordingCoordinator: AI Polish failed (transient), retrying once")
-                                        self.openAIService.polishText(transcribedText, customPrompt: customPrompt, punctuationStyle: puncStyle) { [weak self] retryResult in
-                                            DispatchQueue.main.async { [weak self] in
-                                                guard let self = self else { return }
-                                                let finalText: String
-                                                switch retryResult {
-                                                case .success(let polishedText):
-                                                    AppLogger.transcription.info("RecordingCoordinator: AI Polish retry succeeded")
-                                                    finalText = polishedText
-                                                case .failure(let retryError):
-                                                    AppLogger.transcription.error("RecordingCoordinator: AI Polish retry failed - \(retryError.localizedDescription, privacy: .public)")
-                                                    self.showNotification(
-                                                        title: self.localization.localized(.aiPolishFailed),
-                                                        body: self.localization.localized(.usingOriginalText) + retryError.localizedDescription,
-                                                        isError: false
-                                                    )
-                                                    finalText = transcribedText
-                                                }
-                                                self.processFinalText(finalText)
-                                            }
-                                        }
-
-                                    case .failure(let error):
-                                        AppLogger.transcription.error("RecordingCoordinator: AI Polish failed - \(error.localizedDescription, privacy: .public)")
-                                        self.showNotification(
-                                            title: self.localization.localized(.aiPolishFailed),
-                                            body: self.localization.localized(.usingOriginalText) + error.localizedDescription,
-                                            isError: false
-                                        )
-                                        self.processFinalText(transcribedText)
-                                    }
-                                }
+                            self.polishTextWithRetry(transcribedText, customPrompt: customPrompt, punctuationStyle: puncStyle) { [weak self] finalText in
+                                self?.processFinalText(finalText)
                             }
                         }
                     } else {
@@ -349,6 +302,39 @@ final class RecordingCoordinator {
                 self?.hotkeyManager.restartMonitoring()
             }
             self.appState.updateStatus(.idle)
+        }
+    }
+
+    private func polishTextWithRetry(
+        _ text: String,
+        customPrompt: String?,
+        punctuationStyle: PunctuationStyle,
+        maxRetries: Int = 1,
+        attempt: Int = 0,
+        completion: @escaping (String) -> Void
+    ) {
+        openAIService.polishText(text, customPrompt: customPrompt, punctuationStyle: punctuationStyle) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                switch result {
+                case .success(let polished):
+                    AppLogger.transcription.info("AI Polish succeeded (attempt \(attempt + 1))")
+                    completion(polished)
+                case .failure(let error):
+                    if attempt < maxRetries {
+                        AppLogger.transcription.warning("AI Polish retry \(attempt + 1)/\(maxRetries): \(error.localizedDescription)")
+                        self.polishTextWithRetry(text, customPrompt: customPrompt, punctuationStyle: punctuationStyle, maxRetries: maxRetries, attempt: attempt + 1, completion: completion)
+                    } else {
+                        AppLogger.transcription.error("AI Polish failed after \(maxRetries + 1) attempts: \(error.localizedDescription)")
+                        self.showNotification(
+                            title: self.localization.localized(.aiPolishFailed),
+                            body: self.localization.localized(.usingOriginalText) + error.localizedDescription,
+                            isError: false
+                        )
+                        completion(text) // fallback to original
+                    }
+                }
+            }
         }
     }
 
