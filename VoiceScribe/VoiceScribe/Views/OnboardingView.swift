@@ -201,7 +201,7 @@ struct OnboardingView: View {
 
     private func startRestartCountdown() {
         // Mark onboarding as complete
-        UserDefaults.standard.set(true, forKey: "has_launched_before")
+        AppSettings.shared.hasLaunchedBefore = true
 
         restartCountdown = 3
         restartTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
@@ -263,8 +263,7 @@ struct OnboardingView: View {
     // MARK: - Defaults
 
     private func applyDefaultModeIfNeeded() {
-        guard UserDefaults.standard.string(forKey: "transcription_mode") == nil else { return }
-        UserDefaults.standard.set("senseVoice", forKey: "transcription_mode")
+        AppSettings.shared.setDefaultTranscriptionModeIfNeeded()
     }
 }
 

@@ -54,4 +54,12 @@ final class AppSettings {
         get { defaults.bool(forKey: "has_launched_before") }
         set { defaults.set(newValue, forKey: "has_launched_before") }
     }
+
+    // MARK: - Helper Methods
+
+    /// Set default transcription mode to senseVoice if not already configured
+    func setDefaultTranscriptionModeIfNeeded() {
+        guard defaults.string(forKey: "transcription_mode") == nil else { return }
+        transcriptionMode = .senseVoice
+    }
 }
