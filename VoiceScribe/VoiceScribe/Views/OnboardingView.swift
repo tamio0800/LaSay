@@ -19,6 +19,7 @@ struct OnboardingView: View {
     @State private var permissionTimer: Timer? = nil
     @State private var restartCountdown: Int? = nil
     @State private var restartTimer: Timer? = nil
+    @State private var showAccessibilityGuide: Bool = false
 
     private let localization = LocalizationHelper.shared
 
@@ -67,7 +68,7 @@ struct OnboardingView: View {
             }
         }
         .padding(28)
-        .frame(width: 460, height: 300)
+        .frame(width: 460, height: 420)
         .id(refreshUI)
         .onAppear {
             applyDefaultModeIfNeeded()
@@ -84,14 +85,14 @@ struct OnboardingView: View {
                 .font(.system(size: 64))
                 .foregroundStyle(.green)
 
-            Text("權限設定完成！")
+            Text(localization.localized(.onboardingPermissionsComplete))
                 .font(.title)
                 .fontWeight(.bold)
 
-            Text("即將自動重新啟動 LaSay（\(countdown) 秒）…")
+            Text(String(format: localization.localized(.onboardingRestartingCountdown), countdown))
                 .foregroundColor(.secondary)
 
-            Text("重啟後即可使用 Fn + Space 語音輸入")
+            Text(localization.localized(.onboardingRestartHint))
                 .font(.caption)
                 .foregroundColor(.secondary)
 
@@ -154,18 +155,93 @@ struct OnboardingView: View {
                 }
 
                 if !accessibilityGranted {
-                    Button(localization.localized(.onboardingOpenAccessibility)) {
-                        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
-                        NSWorkspace.shared.open(url)
+                    if showAccessibilityGuide {
+                        accessibilityGuide
+                            .transition(.opacity)
+                    } else {
+                        Button(localization.localized(.onboardingOpenAccessibility)) {
+                            openAccessibilitySettings()
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                showAccessibilityGuide = true
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .accessibilityLabel(localization.localized(.onboardingOpenAccessibility))
+                        .accessibilityHint("Open System Settings to grant accessibility permission")
+                        .transition(.opacity)
                     }
-                    .buttonStyle(.bordered)
-                    .accessibilityLabel(localization.localized(.onboardingOpenAccessibility))
-                    .accessibilityHint("Open System Settings to grant accessibility permission")
                 }
             }
         }
         .onAppear { startPermissionPolling() }
         .onDisappear { stopPermissionPolling() }
+    }
+
+    // MARK: - Accessibility Guide
+
+    private var accessibilityGuide: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(localization.localized(.onboardingAccessibilityGuideIntro))
+                .font(.subheadline)
+                .fontWeight(.medium)
+
+            VStack(alignment: .leading, spacing: 6) {
+                guideStep(number: 1, text: localization.localized(.onboardingAccessibilityStep1))
+                guideStep(number: 2, text: localization.localized(.onboardingAccessibilityStep2))
+                guideStep(number: 3, text: localization.localized(.onboardingAccessibilityStep3))
+            }
+
+            HStack(alignment: .top, spacing: 4) {
+                Image(systemName: "questionmark.circle")
+                    .font(.caption2)
+                Text(localization.localized(.onboardingAccessibilityNotFound))
+                    .font(.caption)
+            }
+            .foregroundColor(.secondary)
+            .padding(.top, 2)
+
+            HStack(spacing: 4) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.caption2)
+                Text(localization.localized(.onboardingAccessibilityAutoUpdate))
+                    .font(.caption)
+            }
+            .foregroundColor(.secondary)
+
+            Button(localization.localized(.onboardingReopenSettings)) {
+                openAccessibilitySettings()
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color(nsColor: .controlBackgroundColor))
+        )
+    }
+
+    private func guideStep(number: Int, text: String) -> some View {
+        HStack(spacing: 8) {
+            Text("\(number)")
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .frame(width: 18, height: 18)
+                .background(Circle().fill(Color.accentColor))
+
+            Text(text)
+                .font(.subheadline)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private func openAccessibilitySettings() {
+        // Register app in Accessibility database so it appears in the list
+        HotkeyManager.shared.requestAccessibilityPermission()
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     // MARK: - Permission Polling

@@ -60,6 +60,14 @@ final class LocalizationTests: XCTestCase {
             .aboutVersion, .aboutTagline, .aboutFeaturesTitle,
             .aboutFeature1, .aboutFeature2, .aboutFeature3, .aboutFeature4,
             .aboutContact,
+            // Accessibility guide
+            .onboardingAccessibilityGuideIntro, .onboardingAccessibilityStep1,
+            .onboardingAccessibilityStep2, .onboardingAccessibilityStep3,
+            .onboardingAccessibilityNotFound,
+            .onboardingAccessibilityAutoUpdate, .onboardingReopenSettings,
+            // Restart
+            .onboardingPermissionsComplete, .onboardingRestartingCountdown,
+            .onboardingRestartHint,
         ]
 
         for key in allKeys {

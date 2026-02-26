@@ -82,6 +82,20 @@ class LocalizationHelper {
         case .onboardingTryItPrompt: return "按住 Fn + Space 試試看！"
         case .onboardingTryItDescription: return "完成後就可以開始使用 LaSay。"
 
+        // Accessibility guide
+        case .onboardingAccessibilityGuideIntro: return "在「系統設定」中完成以下步驟："
+        case .onboardingAccessibilityStep1: return "在列表中找到「LaSay」"
+        case .onboardingAccessibilityStep2: return "開啟旁邊的開關"
+        case .onboardingAccessibilityStep3: return "如有提示，輸入密碼確認"
+        case .onboardingAccessibilityNotFound: return "找不到的話請點擊左下角的 + 並搜尋「LaSay」新增"
+        case .onboardingAccessibilityAutoUpdate: return "完成後會自動偵測"
+        case .onboardingReopenSettings: return "重新打開系統設定"
+
+        // Restart
+        case .onboardingPermissionsComplete: return "權限設定完成！"
+        case .onboardingRestartingCountdown: return "即將自動重新啟動 LaSay（%d 秒）\u{2026}"
+        case .onboardingRestartHint: return "重啟後即可使用 Fn + Space 語音輸入"
+
         // 權限對話框
         case .microphonePermissionTitle: return "需要麥克風權限"
         case .microphonePermissionMessage: return "LaSay 需要麥克風權限才能錄音。請在系統設定中允許麥克風存取。"
@@ -187,6 +201,11 @@ enum LocalizationKey {
     case onboardingMicrophone, onboardingAccessibility
     case onboardingGrantMicrophone, onboardingOpenAccessibility
     case onboardingTryItTitle, onboardingTryItPrompt, onboardingTryItDescription
+    case onboardingAccessibilityGuideIntro, onboardingAccessibilityStep1
+    case onboardingAccessibilityStep2, onboardingAccessibilityStep3
+    case onboardingAccessibilityNotFound
+    case onboardingAccessibilityAutoUpdate, onboardingReopenSettings
+    case onboardingPermissionsComplete, onboardingRestartingCountdown, onboardingRestartHint
 
     // 權限對話框
     case microphonePermissionTitle, microphonePermissionMessage, openSystemSettings
