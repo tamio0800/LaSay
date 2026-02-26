@@ -55,6 +55,11 @@ final class AppSettings {
         set { defaults.set(newValue, forKey: "has_launched_before") }
     }
 
+    var restoreClipboard: Bool {
+        get { defaults.object(forKey: "restore_clipboard") as? Bool ?? true }
+        set { defaults.set(newValue, forKey: "restore_clipboard") }
+    }
+
     // MARK: - Helper Methods
 
     /// Set default transcription mode to senseVoice if not already configured

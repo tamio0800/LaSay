@@ -149,7 +149,7 @@ struct SettingsView: View {
                 HStack(spacing: 6) {
                     ProgressView()
                         .controlSize(.small)
-                    Text("模型載入中…")
+                    Text(localization.localized(.modelLoading))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -199,7 +199,7 @@ struct SettingsView: View {
                 .toggleStyle(.checkbox)
                 .accessibilityLabel(localization.localized(.aiPolishAccessibility))
                 .accessibilityHint(localization.localized(.toggleAccessibilityHint))
-                .accessibilityValue(enableAIPolish ? "已開啟" : "已關閉")
+                .accessibilityValue(enableAIPolish ? localization.localized(.toggleOn) : localization.localized(.toggleOff))
                 .onChange(of: enableAIPolish) { newValue in
                     AppSettings.shared.enableAIPolish = newValue
                     NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
@@ -291,12 +291,12 @@ struct SettingsView: View {
                     }
                     .font(.caption)
 
-                    Button("刪除") {
+                    Button(localization.localized(.deleteAPIKey)) {
                         showDeleteAPIKeyConfirm = true
                     }
                     .font(.caption)
                     .foregroundColor(.red)
-                    .accessibilityLabel("刪除 API Key")
+                    .accessibilityLabel(localization.localized(.deleteAPIKeyAccessibility))
                 }
                 .frame(maxWidth: 420)
             } else {
@@ -349,10 +349,10 @@ struct SettingsView: View {
                 .font(.caption)
         }
         .alert(
-            "確定刪除 API Key？",
+            localization.localized(.deleteAPIKeyConfirmTitle),
             isPresented: $showDeleteAPIKeyConfirm
         ) {
-            Button("刪除", role: .destructive) {
+            Button(localization.localized(.delete), role: .destructive) {
                 _ = keychainHelper.delete(key: "openai_api_key")
                 apiKey = ""
                 hasAPIKey = false
@@ -360,9 +360,9 @@ struct SettingsView: View {
                 showAPIKey = false
                 NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
             }
-            Button("取消", role: .cancel) {}
+            Button(localization.localized(.cancel), role: .cancel) {}
         } message: {
-            Text("刪除後，雲端模式和 AI 潤飾將無法使用，直到重新輸入 API Key。")
+            Text(localization.localized(.deleteAPIKeyConfirmMessage))
         }
     }
 

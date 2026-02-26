@@ -125,6 +125,34 @@ class LocalizationHelper {
         
         // Punctuation
         case .punctuationStyle: return "標點符號"
+
+        // Error descriptions
+        case .invalidAudioFile: return "無效的音訊檔案"
+        case .invalidAPIResponse: return "無效的 API 回應"
+
+        // Recording
+        case .recordingTooShortTitle: return "錄音太短"
+        case .recordingTooShortBody: return "請按住 Fn+Space 說話，放開後自動辨識"
+
+        // Settings
+        case .modelLoading: return "模型載入中..."
+        case .toggleOn: return "已開啟"
+        case .toggleOff: return "已關閉"
+        case .deleteAPIKey: return "刪除"
+        case .deleteAPIKeyAccessibility: return "刪除 API Key"
+        case .deleteAPIKeyConfirmTitle: return "確定刪除 API Key？"
+        case .delete: return "刪除"
+        case .deleteAPIKeyConfirmMessage: return "刪除後，雲端模式和 AI 潤飾將無法使用，直到重新輸入 API Key。"
+
+        // About
+        case .aboutVersion: return "版本 %@ (Build %@)"
+        case .aboutTagline: return "給開發者的語音輸入工具"
+        case .aboutFeaturesTitle: return "功能："
+        case .aboutFeature1: return "SenseVoice 離線辨識 + 雲端 OpenAI"
+        case .aboutFeature2: return "AI 文字清理（保留技術術語）"
+        case .aboutFeature3: return "全域快捷鍵：Fn + Space"
+        case .aboutFeature4: return "任何 app 都能用，包括 Terminal 和 IDE"
+        case .aboutContact: return "聯繫：tamio.tsiu@gmail.com"
         }
     }
 }
@@ -184,4 +212,20 @@ enum LocalizationKey {
     
     // Punctuation
     case punctuationStyle
+
+    // Error descriptions
+    case invalidAudioFile, invalidAPIResponse
+
+    // Recording
+    case recordingTooShortTitle, recordingTooShortBody
+
+    // Settings
+    case modelLoading, toggleOn, toggleOff
+    case deleteAPIKey, deleteAPIKeyAccessibility
+    case deleteAPIKeyConfirmTitle, delete, deleteAPIKeyConfirmMessage
+
+    // About
+    case aboutVersion, aboutTagline, aboutFeaturesTitle
+    case aboutFeature1, aboutFeature2, aboutFeature3, aboutFeature4
+    case aboutContact
 }

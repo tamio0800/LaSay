@@ -134,6 +134,7 @@ final class RecordingCoordinator {
         guard let audioURL = audioRecorder.getLastRecordingURL() else {
             AppLogger.recording.error("RecordingCoordinator: no audio URL available after stop")
             appState.updateStatus(.idle)
+            hotkeyManager.restartMonitoring()
             return
         }
 
@@ -143,8 +144,9 @@ final class RecordingCoordinator {
         if duration < 0.5 {
             AppLogger.recording.info("Recording too short: \(duration, privacy: .public)s, deleting")
             try? FileManager.default.removeItem(at: audioURL)
-            showNotification(title: "錄音太短", body: "請按住 Fn+Space 說話，放開後自動辨識")
+            showNotification(title: localization.localized(.recordingTooShortTitle), body: localization.localized(.recordingTooShortBody))
             appState.updateStatus(.idle)
+            hotkeyManager.restartMonitoring()
             return
         }
 
@@ -174,6 +176,8 @@ final class RecordingCoordinator {
             if !NetworkMonitor.shared.isOnline {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
+                    self.processingTimer?.invalidate()
+                    self.processingTimer = nil
                     self.showNotification(
                         title: self.localization.localized(.noNetworkConnection),
                         body: self.localization.localized(.offlineCloudModeError),
@@ -189,6 +193,8 @@ final class RecordingCoordinator {
             guard let apiKey = KeychainHelper.shared.get(key: "openai_api_key"), !apiKey.isEmpty else {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
+                    self.processingTimer?.invalidate()
+                    self.processingTimer = nil
                     NotificationCenter.default.post(name: NSNotification.Name("OpenSettings"), object: nil)
                     self.showNotification(
                         title: self.localization.localized(.apiKeyRequiredTitle),
@@ -296,7 +302,7 @@ final class RecordingCoordinator {
             }()
             self.appState.saveTranscription(correctedText)
 
-            self.textInputService.pasteText(correctedText, restoreClipboard: true)
+            self.textInputService.pasteText(correctedText, restoreClipboard: AppSettings.shared.restoreClipboard)
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                 self?.hotkeyManager.restartMonitoring()
@@ -346,7 +352,22 @@ final class RecordingCoordinator {
             }
         }
 
-        audioRecorder.onError = { _ in }
+        audioRecorder.onError = { [weak self] error in
+            guard let self = self else { return }
+            AppLogger.recording.error("AudioRecorder error: \(error.localizedDescription, privacy: .public)")
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.processingTimer?.invalidate()
+                self.processingTimer = nil
+                self.showNotification(
+                    title: self.localization.localized(.transcriptionFailed),
+                    body: error.localizedDescription,
+                    isError: true
+                )
+                self.appState.updateStatus(.idle)
+                self.hotkeyManager.restartMonitoring()
+            }
+        }
     }
 
 }

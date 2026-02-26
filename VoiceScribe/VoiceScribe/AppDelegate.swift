@@ -119,31 +119,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 .font(.title)
                 .fontWeight(.bold)
             
-            Text("版本 \(version) (Build \(build))")
+            Text(String(format: localization.localized(.aboutVersion), version, build))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            
-            Text("給開發者的語音輸入工具")
+
+            Text(localization.localized(.aboutTagline))
                 .font(.headline)
                 .padding(.top, 4)
-            
+
             Divider()
-            
+
             VStack(alignment: .leading, spacing: 8) {
-                Text("功能：")
+                Text(localization.localized(.aboutFeaturesTitle))
                     .font(.headline)
-                
-                Text("• SenseVoice 離線辨識 + 雲端 OpenAI")
-                Text("• AI 文字清理（保留技術術語）")
-                Text("• 全域快捷鍵：Fn + Space")
-                Text("• 任何 app 都能用，包括 Terminal 和 IDE")
+
+                Text("• " + localization.localized(.aboutFeature1))
+                Text("• " + localization.localized(.aboutFeature2))
+                Text("• " + localization.localized(.aboutFeature3))
+                Text("• " + localization.localized(.aboutFeature4))
             }
             .font(.caption)
             .frame(maxWidth: .infinity, alignment: .leading)
-            
+
             Divider()
-            
-            Text("聯繫：tamio.tsiu@gmail.com")
+
+            Text(localization.localized(.aboutContact))
                 .font(.caption)
                 .foregroundColor(.secondary)
         }

@@ -8,15 +8,15 @@
 import Foundation
 import os.log
 
-enum OpenAIError: Error {
+enum OpenAIError: Error, LocalizedError {
     case noAPIKey
     case networkError(Error)
     case apiError(String)
     case invalidResponse
 
-    var localizedDescription: String {
+    var errorDescription: String? {
         let localization = LocalizationHelper.shared
-        
+
         switch self {
         case .noAPIKey:
             return localization.localized(.invalidAPIKeyActionable)
@@ -36,7 +36,7 @@ enum OpenAIError: Error {
             }
             return localization.localized(.apiErrorPrefix) + message
         case .invalidResponse:
-            return "無效的 API 回應"
+            return localization.localized(.invalidAPIResponse)
         }
     }
 }

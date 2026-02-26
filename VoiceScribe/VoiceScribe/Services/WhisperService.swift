@@ -8,7 +8,7 @@
 import Foundation
 import os.log
 
-enum WhisperError: Error {
+enum WhisperError: Error, LocalizedError {
     case noAPIKey
     case invalidAudioFile
     case networkError(Error)
@@ -16,14 +16,14 @@ enum WhisperError: Error {
     case invalidResponse
     case modelDownloadFailed
 
-    var localizedDescription: String {
+    var errorDescription: String? {
         let localization = LocalizationHelper.shared
 
         switch self {
         case .noAPIKey:
             return localization.localized(.invalidAPIKeyActionable)
         case .invalidAudioFile:
-            return "無效的音訊檔案"
+            return localization.localized(.invalidAudioFile)
         case .networkError(let error):
             if let urlError = error as? URLError {
                 if urlError.code == .notConnectedToInternet || urlError.code == .networkConnectionLost {
@@ -40,7 +40,7 @@ enum WhisperError: Error {
             }
             return localization.localized(.apiErrorPrefix) + message
         case .invalidResponse:
-            return "無效的 API 回應"
+            return localization.localized(.invalidAPIResponse)
         case .modelDownloadFailed:
             return localization.localized(.modelDownloadFailed)
         }

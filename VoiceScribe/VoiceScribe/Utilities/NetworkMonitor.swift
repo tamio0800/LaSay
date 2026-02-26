@@ -13,11 +13,24 @@ final class NetworkMonitor {
 
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitor")
-    private(set) var isOnline: Bool = true
+    private let lock = NSLock()
+    private var _isOnline: Bool = true
+
+    var isOnline: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return _isOnline
+    }
+
+    private func setOnline(_ value: Bool) {
+        lock.lock()
+        defer { lock.unlock() }
+        _isOnline = value
+    }
 
     private init() {
         monitor.pathUpdateHandler = { [weak self] path in
-            self?.isOnline = path.status == .satisfied
+            self?.setOnline(path.status == .satisfied)
         }
         monitor.start(queue: queue)
     }
