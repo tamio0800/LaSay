@@ -140,7 +140,7 @@ final class RecordingCoordinator {
 
         // 空錄音保護：音訊長度小於 0.5 秒視為錄音太短
         let asset = AVURLAsset(url: audioURL)
-        let duration = CMTimeGetSeconds(asset.duration)
+        let duration = asset.durationSeconds
         if duration < 0.5 {
             AppLogger.recording.info("Recording too short: \(duration, privacy: .public)s, deleting")
             try? FileManager.default.removeItem(at: audioURL)
@@ -370,4 +370,13 @@ final class RecordingCoordinator {
         }
     }
 
+}
+
+private extension AVURLAsset {
+    var durationSeconds: Double {
+        if let audioFile = try? AVAudioFile(forReading: url) {
+            return Double(audioFile.length) / audioFile.fileFormat.sampleRate
+        }
+        return 0
+    }
 }
