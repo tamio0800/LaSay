@@ -4,6 +4,14 @@
 
 This repository contains the LaSay macOS menu-bar app. The Xcode project is at `LaSay/LaSay.xcodeproj`; application code lives under `LaSay/LaSay/`. Keep SwiftUI screens in `Views/`, transcription and system integrations in `Services/`, persisted state in `Models/`, and focused helpers in `Utilities/`. App icons belong in `Assets.xcassets`; bundled speech models and native `sherpa-onnx` headers/libraries live in `Resources/` and `Libraries/`. XCTest sources are in `LaSay/LaSayTests/`.
 
+## Model Delegation
+
+- The session's primary model owns work that requires substantial reasoning, judgment, planning, architectural decisions, or review, and remains responsible for the final result.
+- Delegate execution-heavy implementation, large-scale data collection, repetitive work, and other routine tasks that require limited reasoning to Luna (`gpt-5.6-luna`).
+- The primary model decides whether delegation is appropriate. Use `high` reasoning effort for Luna by default, and increase it up to `max` when the task's complexity or risk warrants it.
+- For long-running work with a clear objective, validation loop, and verifiable stopping condition, the primary model should use `/goal` when available. The primary model retains ownership of the goal and delegates suitable execution-heavy subwork to Luna under the rules above.
+- The primary model must review and integrate Luna's output before presenting or shipping the final result.
+
 ## Build, Test, and Development Commands
 
 - `open LaSay/LaSay.xcodeproj` opens the project for normal development.
