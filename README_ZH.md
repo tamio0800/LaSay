@@ -4,6 +4,10 @@
 
 [English](README.md)
 
+<p align="center"><img src="lasay-icon.png" width="128" alt="LaSay 圖示"></p>
+
+[![CI](https://github.com/tamio0800/LaSay/actions/workflows/ci.yml/badge.svg)](https://github.com/tamio0800/LaSay/actions/workflows/ci.yml)
+
 ## 為什麼需要 LaSay
 
 開發者用混合語言思考。你用中文說「幫我 refactor 那個 useEffect hook」，所有語音工具都會把 useEffect 轉成亂碼。LaSay 內建 300+ 技術術語字典加上 AI 後處理，框架名稱、程式碼識別字、技術用語全部原樣保留。
@@ -24,6 +28,8 @@
 
 ## 快速開始
 
+> 目前尚未提供公開簽章下載；請先依照下方說明從原始碼建置。
+
 ```
 1. 安裝 LaSay.app 到 /Applications
 2. 首次啟動授予麥克風 + 輔助使用權限
@@ -32,6 +38,8 @@
 ```
 
 不用註冊。不用登入。不用雲端同步。你的 API Key，你的資料。
+
+![LaSay 首次啟動權限設定](docs/screenshots/onboarding.png)
 
 ## 架構
 
@@ -129,12 +137,18 @@ macOS Keychain（透過 Security framework）。不在 UserDefaults，不在明�
 
 ## 系統需求
 
-- macOS 13.0（Ventura）或更新
-- Apple Silicon 或 Intel Mac
+- macOS 13.5（Ventura）或更新
+- Apple Silicon Mac
 - 網路連線（僅雲端模式）
 - OpenAI API Key（雲端模式和 AI 清理）
 
 ## 從原始碼建置
+
+```bash
+git clone https://github.com/tamio0800/LaSay.git
+cd LaSay/LaSay
+open LaSay.xcodeproj
+```
 
 請在 Xcode 選擇 Apple Development signing team。不要使用 ad-hoc 簽章，否則每次 rebuild 後 App 身分會改變，macOS 可能要求重新授予隱私權限。
 

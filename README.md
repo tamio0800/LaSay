@@ -4,7 +4,11 @@ Voice input for developers. Dictate in your native language with English technic
 
 [繁體中文說明](README_ZH.md)
 
-![macOS](https://img.shields.io/badge/macOS-13.0+-blue)
+<p align="center"><img src="lasay-icon.png" width="128" alt="LaSay icon"></p>
+
+[![CI](https://github.com/tamio0800/LaSay/actions/workflows/ci.yml/badge.svg)](https://github.com/tamio0800/LaSay/actions/workflows/ci.yml)
+![macOS](https://img.shields.io/badge/macOS-13.5+-blue)
+![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-required-black)
 ![Swift](https://img.shields.io/badge/Swift-5-orange)
 ![License](https://img.shields.io/badge/code-MIT-green)
 
@@ -28,6 +32,8 @@ Works in any app -- VS Code, Terminal, Slack, browser, anywhere you type.
 
 ## Quick Start
 
+> A signed public download is not available yet. Build from source using the instructions below.
+
 ```
 1. Install LaSay.app to /Applications
 2. Grant Microphone + Accessibility permissions on first launch
@@ -36,6 +42,8 @@ Works in any app -- VS Code, Terminal, Slack, browser, anywhere you type.
 ```
 
 No account. No signup. No cloud sync. Your API key, your data.
+
+![LaSay first-launch permission setup](docs/screenshots/onboarding.png)
 
 ## Architecture
 
@@ -133,15 +141,15 @@ In macOS Keychain via the Security framework. Not in UserDefaults, not in plaint
 
 ## System Requirements
 
-- macOS 13.0 (Ventura) or later
-- Apple Silicon or Intel Mac
+- macOS 13.5 (Ventura) or later
+- Apple Silicon Mac
 - Internet connection (Cloud mode only)
 - OpenAI API key (Cloud mode and AI cleanup)
 
 ## Build from Source
 
 ```bash
-git clone https://github.com/tamiotsiuopen/LaSay.git
+git clone https://github.com/tamio0800/LaSay.git
 cd LaSay/LaSay
 open LaSay.xcodeproj
 # Xcode → Product → Build (Cmd+B)
