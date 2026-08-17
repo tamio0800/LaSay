@@ -45,16 +45,6 @@ final class MenuBarManager: NSObject {
         setupMenu()
         observeStateChanges()
 
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleSettingsChanged),
-            name: NSNotification.Name("RefreshMenu"),
-            object: nil
-        )
-    }
-
-    @objc private func handleSettingsChanged() {
-        setupMenu()
     }
 
     private func setupMenu() {

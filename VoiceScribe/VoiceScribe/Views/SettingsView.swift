@@ -96,9 +96,6 @@ struct SettingsView: View {
         }
         .padding(24)
         .frame(minWidth: 500, idealWidth: 500, maxWidth: 500, minHeight: 400, maxHeight: 600)
-        .onDisappear {
-            saveSettingsWithoutAlert()
-        }
     }
 
     // MARK: - Transcription Section
@@ -119,7 +116,6 @@ struct SettingsView: View {
                 .pickerStyle(.menu)
                 .onChange(of: transcriptionMode) { newValue in
                     AppSettings.shared.transcriptionMode = newValue
-                    NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
                     if newValue == .senseVoice, !senseVoiceService.isModelLoaded {
                         isLoadingModel = true
                         senseVoiceService.preloadModel(completion: { _ in isLoadingModel = false })
@@ -202,7 +198,6 @@ struct SettingsView: View {
                 .accessibilityValue(enableAIPolish ? localization.localized(.toggleOn) : localization.localized(.toggleOff))
                 .onChange(of: enableAIPolish) { newValue in
                     AppSettings.shared.enableAIPolish = newValue
-                    NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
                 }
 
             Text(localization.localized(.aiPolishDescription))
@@ -240,6 +235,9 @@ struct SettingsView: View {
                                 .frame(minHeight: 120, maxHeight: 180)
                                 .font(.system(.body, design: .monospaced))
                                 .border(Color.secondary.opacity(0.3))
+                                .onChange(of: customSystemPrompt) { newValue in
+                                    AppSettings.shared.customSystemPrompt = newValue
+                                }
                         }
 
                         HStack {
@@ -321,7 +319,6 @@ struct SettingsView: View {
                             if success {
                                 hasAPIKey = true
                                 showingAPIKeyInput = false
-                                NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
                             }
                         }
                     }
@@ -358,7 +355,6 @@ struct SettingsView: View {
                 hasAPIKey = false
                 showingAPIKeyInput = true
                 showAPIKey = false
-                NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
             }
             Button(localization.localized(.cancel), role: .cancel) {}
         } message: {
@@ -388,25 +384,6 @@ struct SettingsView: View {
             hasAPIKey = false
             showingAPIKeyInput = true
         }
-    }
-
-    func saveSettingsWithoutAlert() {
-        if !apiKey.isEmpty {
-            let success = keychainHelper.save(key: "openai_api_key", value: apiKey)
-            if success {
-                hasAPIKey = true
-                showingAPIKeyInput = false
-            }
-        }
-
-        AppSettings.shared.transcriptionMode = transcriptionMode
-        AppSettings.shared.transcriptionLanguage = transcriptionLanguage
-        AppSettings.shared.punctuationStyle = punctuationStyle
-        AppSettings.shared.enableAIPolish = enableAIPolish
-        AppSettings.shared.customSystemPrompt = customSystemPrompt
-        AppSettings.shared.hasLaunchedBefore = true
-
-        NotificationCenter.default.post(name: NSNotification.Name("RefreshMenu"), object: nil)
     }
 }
 

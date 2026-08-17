@@ -18,7 +18,7 @@ final class AppSettings {
     private init() {}
 
     var transcriptionMode: TranscriptionMode {
-        get { TranscriptionMode.fromSaved(defaults.string(forKey: "transcription_mode")) }
+        get { defaults.string(forKey: "transcription_mode").flatMap(TranscriptionMode.init(rawValue:)) ?? .senseVoice }
         set { defaults.set(newValue.rawValue, forKey: "transcription_mode") }
     }
 

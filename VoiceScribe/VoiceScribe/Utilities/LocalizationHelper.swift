@@ -59,7 +59,6 @@ class LocalizationHelper {
         case .idle: return "待機"
         case .recording: return "錄音中..."
         case .processing: return "處理中..."
-        case .lastTranscription: return "最後轉錄："
         case .settingsMenu: return "設定..."
         case .about: return "關於 LaSay"
         case .quit: return "結束 LaSay"
@@ -188,7 +187,7 @@ enum LocalizationKey {
     case close, paste, changesSavedAutomatically, back, next, finish
 
     // Menu Bar
-    case status, idle, recording, processing, lastTranscription, settingsMenu, about, quit
+    case status, idle, recording, processing, settingsMenu, about, quit
 
     // 視窗標題
     case settingsWindowTitle, onboardingWindowTitle

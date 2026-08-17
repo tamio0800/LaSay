@@ -46,7 +46,6 @@ class OpenAIService {
 
     private let apiURL = "https://api.openai.com/v1/chat/completions"
     private let keychainHelper = KeychainHelper.shared
-    private var currentTask: URLSessionDataTask?
 
     // 預設 System Prompt
     private let defaultSystemPrompt = """
@@ -60,18 +59,7 @@ class OpenAIService {
     """
 
     private let defaultPromptSummary = "Default: remove filler words, fix grammar, preserve technical terms, keep mixed-language input."
-
-
-
-
-
     private init() {}
-    
-    /// Cancel the current polishing request
-    func cancelCurrentRequest() {
-        currentTask?.cancel()
-        currentTask = nil
-    }
 
     // MARK: - Polish Text
 
@@ -131,16 +119,8 @@ class OpenAIService {
         AppLogger.api.info("OpenAIService: starting AI Polish API call")
 
         // 發送請求
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            // Clear the current task reference
-            self?.currentTask = nil
-            
+        let task = URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
-                // Check if it was cancelled
-                if (error as NSError).code == NSURLErrorCancelled {
-                    AppLogger.api.info("OpenAIService: AI Polish request cancelled")
-                    return
-                }
                 AppLogger.api.error("OpenAIService: network error - \(error.localizedDescription, privacy: .public)")
                 completion(.failure(.networkError(error)))
                 return
@@ -184,16 +164,10 @@ class OpenAIService {
             }
         }
 
-        currentTask = task
         task.resume()
     }
 
     // MARK: - Helper Methods
-
-    /// 取得預設 System Prompt
-    func getDefaultSystemPrompt() -> String {
-        return defaultSystemPrompt
-    }
 
     /// 取得預設 Prompt 摘要
     func getDefaultPromptSummary() -> String {

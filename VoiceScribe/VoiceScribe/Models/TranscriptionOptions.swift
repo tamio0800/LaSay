@@ -18,12 +18,6 @@ enum TranscriptionMode: String, CaseIterable {
         }
     }
 
-    /// Load from UserDefaults with backward compatibility
-    static func fromSaved(_ rawValue: String?) -> TranscriptionMode {
-        guard let raw = rawValue else { return .senseVoice }
-        if raw == "local" || raw == "whisperLocal" { return .senseVoice }
-        return TranscriptionMode(rawValue: raw) ?? .senseVoice
-    }
 }
 
 enum TranscriptionLanguage: String, CaseIterable {

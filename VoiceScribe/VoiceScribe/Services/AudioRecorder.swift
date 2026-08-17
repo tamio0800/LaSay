@@ -127,13 +127,6 @@ class AudioRecorder: NSObject {
         }
     }
     
-    /// 清理當前錄音（如果存在）
-    func cleanupCurrentRecording() {
-        if let url = recordingURL {
-            deleteRecording(at: url)
-            recordingURL = nil
-        }
-    }
 }
 
 // MARK: - AVAudioRecorderDelegate

@@ -12,13 +12,9 @@ import Security
 class KeychainHelper {
     static let shared = KeychainHelper()
 
-    private init() {
-        // 執行一次性遷移
-        migrateFromUserDefaults()
-    }
+    private init() {}
 
     private let serviceName = "com.tamio.LaSay"
-    private let legacyKeyPrefix = "com.tamio.LaSay.openai_api_key"
 
     // MARK: - Public API
 
@@ -102,40 +98,5 @@ class KeychainHelper {
         } else {
             return false
         }
-    }
-
-    // MARK: - Migration
-
-    /// 從舊的 UserDefaults Base64 遷移到 Keychain
-    private func migrateFromUserDefaults() {
-        let migrationKey = "keychain_migration_completed"
-        
-        // 檢查是否已經遷移過
-        if UserDefaults.standard.bool(forKey: migrationKey) {
-            return
-        }
-
-
-        // 嘗試遷移已知的 key（目前只有 openai_api_key）
-        let keysToMigrate = ["openai_api_key"]
-
-        for key in keysToMigrate {
-            let legacyKey = "\(legacyKeyPrefix)_\(key)"
-            
-            if let encoded = UserDefaults.standard.string(forKey: legacyKey),
-               let data = Data(base64Encoded: encoded),
-               let value = String(data: data, encoding: .utf8) {
-                
-                // 遷移到 Keychain
-                if save(key: key, value: value) {
-                    // 刪除舊的 UserDefaults 值
-                    UserDefaults.standard.removeObject(forKey: legacyKey)
-                } else {
-                }
-            }
-        }
-
-        // 標記遷移完成
-        UserDefaults.standard.set(true, forKey: migrationKey)
     }
 }

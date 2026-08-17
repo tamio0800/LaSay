@@ -42,7 +42,6 @@ enum AppStatus {
 @MainActor
 class AppState: ObservableObject {
     @Published var status: AppStatus = .idle
-    @Published var lastTranscription: String = ""
 
     // 單例模式
     static let shared = AppState()
@@ -52,10 +51,5 @@ class AppState: ObservableObject {
     // 更新狀態
     func updateStatus(_ newStatus: AppStatus) {
         self.status = newStatus
-    }
-
-    // 儲存最後一次轉錄結果
-    func saveTranscription(_ text: String) {
-        self.lastTranscription = text
     }
 }

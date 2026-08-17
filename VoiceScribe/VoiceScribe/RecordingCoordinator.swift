@@ -23,12 +23,6 @@ final class RecordingCoordinator {
 
     private var processingTimer: Timer?
     
-    /// Cancel all ongoing API requests
-    func cancelAllRequests() {
-        cloudService.cancelCurrentRequest()
-        openAIService.cancelCurrentRequest()
-    }
-
     init(
         appState: AppState,
         audioRecorder: AudioRecorder,
@@ -54,10 +48,6 @@ final class RecordingCoordinator {
         requestMicrophonePermission()
         setupAudioRecorderCallbacks()
         setupGlobalHotkey()
-    }
-
-    func requestAccessibilityPermission() {
-        hotkeyManager.showAccessibilityAlert()
     }
 
     // MARK: - Microphone Permission
@@ -300,8 +290,6 @@ final class RecordingCoordinator {
                 let style = AppSettings.shared.punctuationStyle
                 return PunctuationConverter.convert(techCorrected, to: style)
             }()
-            self.appState.saveTranscription(correctedText)
-
             self.textInputService.pasteText(correctedText, restoreClipboard: AppSettings.shared.restoreClipboard)
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in

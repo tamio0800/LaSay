@@ -18,7 +18,7 @@ final class LocalizationTests: XCTestCase {
             // Buttons
             .close, .paste, .changesSavedAutomatically, .back, .next, .finish,
             // Menu Bar
-            .status, .idle, .recording, .processing, .lastTranscription, .settingsMenu, .about, .quit,
+            .status, .idle, .recording, .processing, .settingsMenu, .about, .quit,
             // Window titles
             .settingsWindowTitle, .onboardingWindowTitle,
             // About

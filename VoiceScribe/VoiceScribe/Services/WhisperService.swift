@@ -52,16 +52,8 @@ class WhisperService {
 
     private let apiURL = "https://api.openai.com/v1/audio/transcriptions"
     private let keychainHelper = KeychainHelper.shared
-    private var currentTask: URLSessionDataTask?
 
     private init() {}
-    
-    /// Cancel the current transcription request
-    func cancelCurrentRequest() {
-        currentTask?.cancel()
-        currentTask = nil
-    }
-
     // MARK: - Transcribe
 
     /// 轉錄音訊檔案，自動辨識語言
@@ -139,16 +131,8 @@ class WhisperService {
         AppLogger.api.info("WhisperService: starting transcription API call")
 
         // 發送請求
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            // Clear the current task reference
-            self?.currentTask = nil
-            
+        let task = URLSession.shared.dataTask(with: request) { data, _, error in
             if let error = error {
-                // Check if it was cancelled
-                if (error as NSError).code == NSURLErrorCancelled {
-                    AppLogger.api.info("WhisperService: transcription request cancelled")
-                    return
-                }
                 AppLogger.api.error("WhisperService: network error - \(error.localizedDescription, privacy: .public)")
                 completion(.failure(.networkError(error)))
                 return
@@ -188,7 +172,6 @@ class WhisperService {
             }
         }
 
-        currentTask = task
         task.resume()
     }
 }

@@ -14,7 +14,6 @@ class HotkeyManager {
 
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
-    private var permissionCheckTimer: Timer?
     
     // Thread-safe state access
     private let stateQueue = DispatchQueue(label: "com.lasay.hotkeymanager.state")
@@ -48,80 +47,6 @@ class HotkeyManager {
     func requestAccessibilityPermission() {
         let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true]
         _ = AXIsProcessTrustedWithOptions(options)
-    }
-
-    /// 顯示權限引導視窗
-    func showAccessibilityAlert() {
-        let localization = LocalizationHelper.shared
-
-        let alert = NSAlert()
-        alert.messageText = localization.localized(.accessibilityPermissionTitle)
-        alert.informativeText = localization.localized(.accessibilityPermissionMessage)
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: localization.localized(.openSystemSettings))
-        alert.addButton(withTitle: localization.localized(.restartLater))
-
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            openAccessibilitySettings()
-
-            // 啟動背景檢查，監聽權限變化
-            startPermissionMonitoring()
-        }
-    }
-
-    /// 監聽權限變化，授予後自動提示重啟
-    private func startPermissionMonitoring() {
-        // 每 1 秒檢查一次權限狀態
-        permissionCheckTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
-            guard let self = self else {
-                timer.invalidate()
-                return
-            }
-
-            if self.checkAccessibilityPermission() {
-                timer.invalidate()  // 停止檢查
-                self.permissionCheckTimer = nil
-                self.showRestartAlert()
-            }
-        }
-    }
-
-    /// 顯示重啟提示
-    private func showRestartAlert() {
-        let localization = LocalizationHelper.shared
-
-        DispatchQueue.main.async {
-            let alert = NSAlert()
-            alert.messageText = localization.localized(.accessibilityGrantedTitle)
-            alert.informativeText = localization.localized(.accessibilityGrantedMessage)
-            alert.alertStyle = .informational
-            alert.addButton(withTitle: localization.localized(.restartNow))
-            alert.addButton(withTitle: localization.localized(.restartLater))
-
-            let response = alert.runModal()
-            if response == .alertFirstButtonReturn {
-                self.restartApp()
-            }
-        }
-    }
-
-    /// 重啟 app (sandbox-safe using NSWorkspace)
-    private func restartApp() {
-        guard let bundleURL = Bundle.main.bundleURL as URL? else { return }
-        let config = NSWorkspace.OpenConfiguration()
-        config.createsNewApplicationInstance = true
-        NSWorkspace.shared.openApplication(at: bundleURL, configuration: config) { _, _ in
-            DispatchQueue.main.async {
-                NSApp.terminate(nil)
-            }
-        }
-    }
-
-    /// 打開系統設定的輔助使用頁面
-    private func openAccessibilitySettings() {
-        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
-        NSWorkspace.shared.open(url)
     }
 
     // MARK: - Hotkey Management
@@ -183,10 +108,6 @@ class HotkeyManager {
             self.runLoopSource = nil
             AppLogger.ui.info("HotkeyManager: hotkey monitoring stopped")
         }
-        
-        // Invalidate permission check timer
-        permissionCheckTimer?.invalidate()
-        permissionCheckTimer = nil
     }
 
     /// 重新啟動監聽（用於恢復）
