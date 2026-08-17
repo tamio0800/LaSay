@@ -26,7 +26,9 @@ enum PunctuationConverter {
     private static let halfWidthSet: [Character: String] = {
         var map = [Character: String]()
         for (fw, hw) in fullToHalf {
-            map[Character(hw)] = fw
+            if map[Character(hw)] == nil {
+                map[Character(hw)] = fw
+            }
         }
         return map
     }()

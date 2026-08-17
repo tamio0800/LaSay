@@ -20,8 +20,19 @@
 		BB0000020000000E /* libsherpa-onnx-cxx-api.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB0000010000000E /* libsherpa-onnx-cxx-api.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		AA000001000000000000000A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 31E4AED42F262512002093FB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 31E4AEDB2F262512002093FB;
+			remoteInfo = VoiceScribe;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		31E4AEDC2F262512002093FB /* VoiceScribe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = VoiceScribe.app; path = LaSay.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000010000000000000001 /* VoiceScribeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceScribeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB00000100000001 /* libsherpa-onnx-c-api.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-c-api.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libsherpa-onnx-c-api.a"; sourceTree = "<group>"; };
 		BB00000100000002 /* libsherpa-onnx-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-core.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libsherpa-onnx-core.a"; sourceTree = "<group>"; };
 		BB00000100000003 /* libonnxruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libonnxruntime.a; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libonnxruntime.a"; sourceTree = "<group>"; };
@@ -39,6 +50,11 @@
 		31E4AEDE2F262512002093FB /* VoiceScribe */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = VoiceScribe;
+			sourceTree = "<group>";
+		};
+		AA0000010000000000000002 /* VoiceScribeTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = VoiceScribeTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -62,6 +78,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA0000010000000000000003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -69,6 +92,7 @@
 			isa = PBXGroup;
 			children = (
 				31E4AEDE2F262512002093FB /* VoiceScribe */,
+				AA0000010000000000000002 /* VoiceScribeTests */,
 				31E4AEDD2F262512002093FB /* Products */,
 				BB00000300000001 /* Frameworks */,
 			);
@@ -78,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				31E4AEDC2F262512002093FB /* VoiceScribe.app */,
+				AA0000010000000000000001 /* VoiceScribeTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -125,6 +150,29 @@
 			productReference = 31E4AEDC2F262512002093FB /* VoiceScribe.app */;
 			productType = "com.apple.product-type.application";
 		};
+		AA0000010000000000000006 /* VoiceScribeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0000010000000000000009 /* Build configuration list for PBXNativeTarget "VoiceScribeTests" */;
+			buildPhases = (
+				AA0000010000000000000005 /* Sources */,
+				AA0000010000000000000003 /* Frameworks */,
+				AA0000010000000000000004 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA000001000000000000000B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AA0000010000000000000002 /* VoiceScribeTests */,
+			);
+			name = VoiceScribeTests;
+			packageProductDependencies = (
+			);
+			productName = VoiceScribeTests;
+			productReference = AA0000010000000000000001 /* VoiceScribeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -138,6 +186,10 @@
 					31E4AEDB2F262512002093FB = {
 						CreatedOnToolsVersion = 26.2;
 					};
+					AA0000010000000000000006 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 31E4AEDB2F262512002093FB;
+					};
 				};
 			};
 			buildConfigurationList = 31E4AED72F262512002093FB /* Build configuration list for PBXProject "VoiceScribe" */;
@@ -145,6 +197,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"zh-Hant",
 				Base,
 			);
 			mainGroup = 31E4AED32F262512002093FB;
@@ -155,12 +208,20 @@
 			projectRoot = "";
 			targets = (
 				31E4AEDB2F262512002093FB /* VoiceScribe */,
+				AA0000010000000000000006 /* VoiceScribeTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		31E4AEDA2F262512002093FB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0000010000000000000004 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -177,7 +238,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA0000010000000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AA000001000000000000000B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 31E4AEDB2F262512002093FB /* VoiceScribe */;
+			targetProxy = AA000001000000000000000A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		31E4AEE52F262513002093FB /* Debug */ = {
@@ -412,6 +488,38 @@
 			};
 			name = Release;
 		};
+		AA0000010000000000000007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BGRL67W69Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tamio.LaSayTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LaSay.app/Contents/MacOS/LaSay";
+			};
+			name = Debug;
+		};
+		AA0000010000000000000008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BGRL67W69Y;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tamio.LaSayTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LaSay.app/Contents/MacOS/LaSay";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -429,6 +537,15 @@
 			buildConfigurations = (
 				31E4AEE82F262513002093FB /* Debug */,
 				31E4AEE92F262513002093FB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA0000010000000000000009 /* Build configuration list for PBXNativeTarget "VoiceScribeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000010000000000000007 /* Debug */,
+				AA0000010000000000000008 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

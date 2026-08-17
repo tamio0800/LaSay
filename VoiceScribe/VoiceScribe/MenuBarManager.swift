@@ -10,8 +10,7 @@ import Combine
 import QuartzCore
 
 final class MenuBarManager: NSObject {
-    private let appState: AppState
-    private let hotkeyManager: HotkeyManager
+    private let appState = AppState.shared
     private let onOpenSettings: () -> Void
     private let onShowAbout: () -> Void
     private let onQuit: () -> Void
@@ -20,14 +19,10 @@ final class MenuBarManager: NSObject {
     private var cancellables = Set<AnyCancellable>()
 
     init(
-        appState: AppState,
-        hotkeyManager: HotkeyManager,
         onOpenSettings: @escaping () -> Void,
         onShowAbout: @escaping () -> Void,
         onQuit: @escaping () -> Void
     ) {
-        self.appState = appState
-        self.hotkeyManager = hotkeyManager
         self.onOpenSettings = onOpenSettings
         self.onShowAbout = onShowAbout
         self.onQuit = onQuit
@@ -38,7 +33,7 @@ final class MenuBarManager: NSObject {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem?.button {
-            button.setAccessibilityLabel(LocalizationHelper.shared.localized(.menuBarStatusAccessibility))
+            button.setAccessibilityLabel(String(localized: "LaSay 語音輸入"))
             updateMenuBarIcon()
         }
 
@@ -49,17 +44,15 @@ final class MenuBarManager: NSObject {
 
     private func setupMenu() {
         let menu = NSMenu()
-        let localization = LocalizationHelper.shared
-
         // 狀態顯示
         let statusText: String
         switch appState.status {
         case .idle:
-            statusText = localization.localized(.idle)
+            statusText = String(localized: "待機")
         case .recording:
-            statusText = localization.localized(.recording)
+            statusText = String(localized: "錄音中...")
         case .processing:
-            statusText = localization.localized(.processing)
+            statusText = String(localized: "處理中...")
         }
         let statusMenuItem = NSMenuItem(title: statusText, action: nil, keyEquivalent: "")
         statusMenuItem.isEnabled = false
@@ -67,15 +60,15 @@ final class MenuBarManager: NSObject {
 
         menu.addItem(NSMenuItem.separator())
 
-        let settingsItem = NSMenuItem(title: localization.localized(.settingsMenu), action: #selector(openSettings), keyEquivalent: ",")
+        let settingsItem = NSMenuItem(title: String(localized: "設定..."), action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
 
-        let aboutItem = NSMenuItem(title: localization.localized(.about), action: #selector(showAbout), keyEquivalent: "")
+        let aboutItem = NSMenuItem(title: String(localized: "關於 LaSay"), action: #selector(showAbout), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
 
-        let quitItem = NSMenuItem(title: localization.localized(.quit), action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: String(localized: "結束 LaSay"), action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 
@@ -96,7 +89,6 @@ final class MenuBarManager: NSObject {
         guard let button = statusItem?.button else { return }
 
         let status = appState.status
-        let localization = LocalizationHelper.shared
         let image = NSImage(systemSymbolName: status.iconName, accessibilityDescription: "LaSay")
         image?.isTemplate = false
 
@@ -106,17 +98,17 @@ final class MenuBarManager: NSObject {
         let statusText: String
         switch status {
         case .idle:
-            statusText = localization.localized(.idle)
+            statusText = String(localized: "待機")
         case .recording:
-            statusText = localization.localized(.recording)
+            statusText = String(localized: "錄音中...")
         case .processing:
-            statusText = localization.localized(.processing)
+            statusText = String(localized: "處理中...")
         }
         
-        button.setAccessibilityLabel("\(localization.localized(.menuBarStatusAccessibility)) - \(statusText)")
+        button.setAccessibilityLabel("\(String(localized: "LaSay 語音輸入")) - \(statusText)")
         
         // Post accessibility announcement for state changes
-        let announcement = "\(localization.localized(.menuBarStatusAccessibility)) \(statusText)"
+        let announcement = "\(String(localized: "LaSay 語音輸入")) \(statusText)"
         NSAccessibility.post(element: button, notification: .announcementRequested, userInfo: [
             .announcement: announcement,
             .priority: NSAccessibilityPriorityLevel.high.rawValue

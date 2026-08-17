@@ -30,11 +30,9 @@ struct SettingsView: View {
     private let keychainHelper = KeychainHelper.shared
     private let openAIService = OpenAIService.shared
     private let senseVoiceService = SenseVoiceService.shared
-    private let localization = LocalizationHelper.shared
-
     var body: some View {
         VStack(spacing: 16) {
-            Text(localization.localized(.settings))
+            Text(String(localized: "設定"))
                 .font(.title)
                 .fontWeight(.bold)
 
@@ -81,17 +79,17 @@ struct SettingsView: View {
             Spacer()
 
             HStack {
-                Text(localization.localized(.changesSavedAutomatically))
+                Text(String(localized: "自動儲存（API Key 除外）"))
                     .font(.caption)
                     .foregroundColor(.secondary)
 
                 Spacer()
 
-                Button(localization.localized(.close)) {
+                Button(String(localized: "關閉")) {
                     dismiss()
                 }
                 .keyboardShortcut(.cancelAction)
-                .accessibilityLabel(localization.localized(.settingsCloseAccessibility))
+                .accessibilityLabel(String(localized: "關閉設定視窗"))
             }
         }
         .padding(24)
@@ -102,11 +100,11 @@ struct SettingsView: View {
 
     private var transcriptionSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(localization.localized(.transcriptionSettings))
+            Text(String(localized: "語音轉錄"))
                 .font(.headline)
 
             HStack {
-                Text(localization.localized(.transcriptionMode))
+                Text(String(localized: "轉錄模式"))
                 Spacer()
                 Picker("", selection: $transcriptionMode) {
                     ForEach(TranscriptionMode.allCases, id: \.self) { mode in
@@ -124,7 +122,7 @@ struct SettingsView: View {
             }
 
             HStack {
-                Text(localization.localized(.transcriptionLanguage))
+                Text(String(localized: "轉錄語言"))
                 Spacer()
                 Picker("", selection: $transcriptionLanguage) {
                     ForEach(TranscriptionLanguage.allCases, id: \.self) { language in
@@ -137,7 +135,7 @@ struct SettingsView: View {
                 }
             }
 
-            Text(localization.localized(.transcriptionDescription))
+            Text(String(localized: "SenseVoice 離線辨識，雲端使用 OpenAI API"))
                 .font(.caption)
                 .foregroundColor(.secondary)
 
@@ -145,7 +143,7 @@ struct SettingsView: View {
                 HStack(spacing: 6) {
                     ProgressView()
                         .controlSize(.small)
-                    Text(localization.localized(.modelLoading))
+                    Text(String(localized: "模型載入中..."))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -157,7 +155,7 @@ struct SettingsView: View {
 
     private var punctuationSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(localization.localized(.punctuationStyle))
+            Text(String(localized: "標點符號"))
                 .font(.headline)
 
             Picker("", selection: $punctuationStyle) {
@@ -188,38 +186,38 @@ struct SettingsView: View {
 
     private var aiPolishSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(localization.localized(.aiPolish))
+            Text(String(localized: "AI 文字潤飾"))
                 .font(.headline)
 
-            Toggle(localization.localized(.enableAIPolish), isOn: $enableAIPolish)
+            Toggle(String(localized: "啟用 AI 潤飾（使用 GPT-5-mini）"), isOn: $enableAIPolish)
                 .toggleStyle(.checkbox)
-                .accessibilityLabel(localization.localized(.aiPolishAccessibility))
-                .accessibilityHint(localization.localized(.toggleAccessibilityHint))
-                .accessibilityValue(enableAIPolish ? localization.localized(.toggleOn) : localization.localized(.toggleOff))
+                .accessibilityLabel(String(localized: "AI 潤飾開關"))
+                .accessibilityHint(String(localized: "點擊以切換"))
+                .accessibilityValue(enableAIPolish ? String(localized: "已開啟") : String(localized: "已關閉"))
                 .onChange(of: enableAIPolish) { newValue in
                     AppSettings.shared.enableAIPolish = newValue
                 }
 
-            Text(localization.localized(.aiPolishDescription))
+            Text(String(localized: "移除口語贅字、修正文法、優化句子結構"))
                 .font(.caption)
                 .foregroundColor(.secondary)
 
             if enableAIPolish {
-                Text(localization.localized(.aiCleanupDetail))
+                Text(String(localized: "AI 清理：移除贅字、修正文法、保留技術術語"))
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                DisclosureGroup(localization.localized(.advanced), isExpanded: $isAIPolishAdvancedExpanded) {
+                DisclosureGroup(String(localized: "進階設定"), isExpanded: $isAIPolishAdvancedExpanded) {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(String(format: localization.localized(.currentPromptStatus), isUsingCustomPrompt ? localization.localized(.customPromptLabel) : localization.localized(.defaultPromptLabel)))
+                        Text(String(format: String(localized: "目前使用：%@"), isUsingCustomPrompt ? String(localized: "自訂") : String(localized: "預設")))
                             .font(.caption)
                             .foregroundColor(.secondary)
 
-                        Text(localization.localized(.customPromptHint))
+                        Text(String(localized: "你可以在這裡自訂 AI 潤飾的指令"))
                             .font(.caption)
                             .foregroundColor(.secondary)
 
-                        Text(localization.localized(.customSystemPrompt))
+                        Text(String(localized: "自訂 System Prompt（選填）"))
                             .font(.subheadline)
 
                         ZStack(alignment: .topLeading) {
@@ -241,7 +239,7 @@ struct SettingsView: View {
                         }
 
                         HStack {
-                            Button(localization.localized(.resetToDefault)) {
+                            Button(String(localized: "重設為預設")) {
                                 customSystemPrompt = ""
                             }
                             .font(.caption)
@@ -259,12 +257,12 @@ struct SettingsView: View {
 
     private var apiKeySection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(localization.localized(.openAIAPIKey))
+            Text(String(localized: "OpenAI API Key"))
                 .font(.headline)
 
             if hasAPIKey && !showingAPIKeyInput {
                 HStack {
-                    Text(localization.localized(.apiKeySet))
+                    Text(String(localized: "已設定 API Key"))
                         .foregroundColor(.green)
 
                     if showAPIKey {
@@ -278,42 +276,42 @@ struct SettingsView: View {
 
                     Spacer()
 
-                    Button(localization.localized(showAPIKey ? .hide : .show)) {
+                    Button(showAPIKey ? String(localized: "隱藏") : String(localized: "顯示")) {
                         showAPIKey.toggle()
                     }
                     .font(.caption)
-                    .accessibilityLabel(localization.localized(.apiKeyShowHideAccessibility))
+                    .accessibilityLabel(String(localized: "顯示或隱藏 API Key"))
 
-                    Button(localization.localized(.update)) {
+                    Button(String(localized: "更新")) {
                         showingAPIKeyInput = true
                     }
                     .font(.caption)
 
-                    Button(localization.localized(.deleteAPIKey)) {
+                    Button(String(localized: "刪除")) {
                         showDeleteAPIKeyConfirm = true
                     }
                     .font(.caption)
                     .foregroundColor(.red)
-                    .accessibilityLabel(localization.localized(.deleteAPIKeyAccessibility))
+                    .accessibilityLabel(String(localized: "刪除 API Key"))
                 }
                 .frame(maxWidth: 420)
             } else {
                 HStack {
                     if showAPIKey {
-                        TextField(localization.localized(.enterAPIKey), text: $apiKey)
+                        TextField(String(localized: "請輸入 API Key (sk-...)"), text: $apiKey)
                             .textFieldStyle(.roundedBorder)
                     } else {
-                        SecureField(localization.localized(.enterAPIKey), text: $apiKey)
+                        SecureField(String(localized: "請輸入 API Key (sk-...)"), text: $apiKey)
                             .textFieldStyle(.roundedBorder)
                     }
 
-                    Button(localization.localized(showAPIKey ? .hide : .show)) {
+                    Button(showAPIKey ? String(localized: "隱藏") : String(localized: "顯示")) {
                         showAPIKey.toggle()
                     }
                     .font(.caption)
-                    .accessibilityLabel(localization.localized(.apiKeyShowHideAccessibility))
+                    .accessibilityLabel(String(localized: "顯示或隱藏 API Key"))
 
-                    Button(localization.localized(.save)) {
+                    Button(String(localized: "儲存")) {
                         if !apiKey.isEmpty {
                             let success = keychainHelper.save(key: "openai_api_key", value: apiKey)
                             if success {
@@ -324,41 +322,41 @@ struct SettingsView: View {
                     }
                     .font(.caption)
                     .buttonStyle(.borderedProminent)
-                    .accessibilityLabel(localization.localized(.apiKeySaveAccessibility))
+                    .accessibilityLabel(String(localized: "儲存 API Key"))
 
                     if hasAPIKey {
-                        Button(localization.localized(.cancel)) {
+                        Button(String(localized: "取消")) {
                             showingAPIKeyInput = false
                             loadAPIKey()
                         }
                         .font(.caption)
-                        .accessibilityLabel(localization.localized(.cancelButtonAccessibility))
+                        .accessibilityLabel(String(localized: "取消"))
                     }
                 }
                 .frame(maxWidth: 420)
             }
 
-            Text(localization.localized(.apiKeyDescription))
+            Text(String(localized: "用於雲端語音轉錄與 AI 文字潤飾"))
                 .font(.caption)
                 .foregroundColor(.secondary)
 
-            Link(localization.localized(.getAPIKey), destination: URL(string: "https://platform.openai.com/api-keys")!)
+            Link(String(localized: "取得 API Key → platform.openai.com"), destination: URL(string: "https://platform.openai.com/api-keys")!)
                 .font(.caption)
         }
         .alert(
-            localization.localized(.deleteAPIKeyConfirmTitle),
+            String(localized: "確定刪除 API Key？"),
             isPresented: $showDeleteAPIKeyConfirm
         ) {
-            Button(localization.localized(.delete), role: .destructive) {
+            Button(String(localized: "刪除"), role: .destructive) {
                 _ = keychainHelper.delete(key: "openai_api_key")
                 apiKey = ""
                 hasAPIKey = false
                 showingAPIKeyInput = true
                 showAPIKey = false
             }
-            Button(localization.localized(.cancel), role: .cancel) {}
+            Button(String(localized: "取消"), role: .cancel) {}
         } message: {
-            Text(localization.localized(.deleteAPIKeyConfirmMessage))
+            Text(String(localized: "刪除後，雲端模式和 AI 潤飾將無法使用，直到重新輸入 API Key。"))
         }
     }
 

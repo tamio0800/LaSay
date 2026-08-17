@@ -15,28 +15,26 @@ enum OpenAIError: Error, LocalizedError {
     case invalidResponse
 
     var errorDescription: String? {
-        let localization = LocalizationHelper.shared
-
         switch self {
         case .noAPIKey:
-            return localization.localized(.invalidAPIKeyActionable)
+            return String(localized: "API Key 無效 (401)。前往設定更新 Key。")
         case .networkError(let error):
             if let urlError = error as? URLError {
                 if urlError.code == .notConnectedToInternet || urlError.code == .networkConnectionLost {
-                    return localization.localized(.networkErrorActionable)
+                    return String(localized: "網路錯誤：無法連線至 API。檢查網路或切換至本地模式。")
                 } else if urlError.code == .timedOut {
-                    return localization.localized(.processingTimeout)
+                    return String(localized: "處理逾時。請重試。")
                 }
             }
-            return localization.localized(.networkErrorActionable)
+            return String(localized: "網路錯誤：無法連線至 API。檢查網路或切換至本地模式。")
         case .apiError(let message):
             let lowered = message.lowercased()
             if lowered.contains("api key") || lowered.contains("incorrect api key") || lowered.contains("invalid api key") || lowered.contains("401") || lowered.contains("unauthorized") {
-                return localization.localized(.invalidAPIKeyActionable)
+                return String(localized: "API Key 無效 (401)。前往設定更新 Key。")
             }
-            return localization.localized(.apiErrorPrefix) + message
+            return String(localized: "API 錯誤：") + message
         case .invalidResponse:
-            return localization.localized(.invalidAPIResponse)
+            return String(localized: "無效的 API 回應")
         }
     }
 }

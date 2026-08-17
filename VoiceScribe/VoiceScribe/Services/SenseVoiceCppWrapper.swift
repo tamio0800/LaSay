@@ -62,7 +62,7 @@ final class SenseVoiceCppWrapper {
     }
 
     /// Transcribe a 16kHz mono WAV file. Returns the transcribed text.
-    func transcribe(wavURL: URL, language: String?) -> String? {
+    func transcribe(wavURL: URL) -> String? {
         guard let recognizer = recognizer else { return nil }
 
         // Use sherpa-onnx's built-in WAV reader

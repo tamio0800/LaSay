@@ -1,5 +1,5 @@
 import XCTest
-@testable import VoiceScribe
+@testable import LaSay
 
 @MainActor
 final class AppSettingsTests: XCTestCase {

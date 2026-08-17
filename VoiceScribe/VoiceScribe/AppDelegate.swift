@@ -14,12 +14,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var settingsWindow: NSWindow?
     private var onboardingWindow: NSWindow?
     private var aboutWindow: NSWindow?
-    private let localization = LocalizationHelper.shared
-
     func applicationDidFinishLaunching(_ notification: Notification) {
         menuBarManager = MenuBarManager(
-            appState: AppState.shared,
-            hotkeyManager: HotkeyManager.shared,
             onOpenSettings: { [weak self] in self?.openSettings() },
             onShowAbout: { [weak self] in self?.showAbout() },
             onQuit: { [weak self] in self?.quitApp() }
@@ -28,16 +24,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         NotificationCenter.default.addObserver(self, selector: #selector(openSettings), name: NSNotification.Name("OpenSettings"), object: nil)
 
-        recordingCoordinator = RecordingCoordinator(
-            appState: AppState.shared,
-            audioRecorder: AudioRecorder.shared,
-            cloudService: WhisperService.shared,
-            senseVoiceService: SenseVoiceService.shared,
-            openAIService: OpenAIService.shared,
-            textInputService: TextInputService.shared,
-            hotkeyManager: HotkeyManager.shared,
-            localization: localization
-        )
+        recordingCoordinator = RecordingCoordinator()
         recordingCoordinator?.start()
 
         // Pre-load SenseVoice model on launch
@@ -60,7 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let window = NSWindow(contentViewController: hostingController)
         // 視窗標題根據介面語言顯示
-        window.title = localization.localized(.settingsWindowTitle)
+        window.title = String(localized: "LaSay 設定")
         window.styleMask = [.titled, .closable]
         window.setContentSize(NSSize(width: 500, height: 480))
         window.center()
@@ -87,7 +74,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let hostingController = NSHostingController(rootView: onboardingView)
         let window = NSWindow(contentViewController: hostingController)
-        window.title = localization.localized(.onboardingWindowTitle)
+        window.title = String(localized: "歡迎使用")
         window.styleMask = [.titled, .closable]
         window.center()
         window.makeKeyAndOrderFront(nil)
@@ -119,31 +106,31 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 .font(.title)
                 .fontWeight(.bold)
             
-            Text(String(format: localization.localized(.aboutVersion), version, build))
+            Text(String(format: String(localized: "版本 %@ (Build %@)"), version, build))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
 
-            Text(localization.localized(.aboutTagline))
+            Text(String(localized: "給開發者的語音輸入工具"))
                 .font(.headline)
                 .padding(.top, 4)
 
             Divider()
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(localization.localized(.aboutFeaturesTitle))
+                Text(String(localized: "功能："))
                     .font(.headline)
 
-                Text("• " + localization.localized(.aboutFeature1))
-                Text("• " + localization.localized(.aboutFeature2))
-                Text("• " + localization.localized(.aboutFeature3))
-                Text("• " + localization.localized(.aboutFeature4))
+                Text("• " + String(localized: "SenseVoice 離線辨識 + 雲端 OpenAI"))
+                Text("• " + String(localized: "AI 文字清理（保留技術術語）"))
+                Text("• " + String(localized: "全域快捷鍵：Fn + Space"))
+                Text("• " + String(localized: "任何 app 都能用，包括 Terminal 和 IDE"))
             }
             .font(.caption)
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Divider()
 
-            Text(localization.localized(.aboutContact))
+            Text(String(localized: "聯繫：tamio.tsiu@gmail.com"))
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
@@ -152,7 +139,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let hostingController = NSHostingController(rootView: aboutView)
         let window = NSWindow(contentViewController: hostingController)
-        window.title = localization.localized(.aboutTitle)
+        window.title = String(localized: "LaSay")
         window.styleMask = [.titled, .closable]
         window.setContentSize(NSSize(width: 400, height: 420))
         window.center()

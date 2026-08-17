@@ -11,21 +11,12 @@ import os.log
 final class SenseVoiceService {
     static let shared = SenseVoiceService()
 
-    private let fileManager = FileManager.default
     private let modelQueue = DispatchQueue(label: "com.lasay.sensevoice.model")
     private var wrapper: SenseVoiceCppWrapper?
     private(set) var isModelLoaded: Bool = false
     private var isLoadingModel: Bool = false
 
     private init() {}
-
-    // MARK: - Paths
-
-    /// Model files are bundled in app Resources/
-    /// Xcode copies them directly to Resources root (no subfolder).
-    private var bundledModelDir: String? {
-        Bundle.main.resourcePath
-    }
 
     // MARK: - Public
 
@@ -35,7 +26,7 @@ final class SenseVoiceService {
             completion?(isModelLoaded)
             return
         }
-        guard let modelDir = bundledModelDir else {
+        guard let modelDir = Bundle.main.resourcePath else {
             AppLogger.transcription.error("SenseVoiceService: bundled model directory not found")
             completion?(false)
             return
@@ -45,10 +36,7 @@ final class SenseVoiceService {
         isLoadingModel = true
         modelQueue.async { [weak self] in
             guard let self = self else { return }
-            if self.wrapper == nil {
-                self.wrapper = SenseVoiceCppWrapper(modelDir: modelDir)
-            }
-            let loaded = self.wrapper != nil
+            let loaded = self.loadModelIfNeeded(from: modelDir) != nil
             DispatchQueue.main.async {
                 if loaded {
                     AppLogger.transcription.info("SenseVoiceService: model loaded successfully")
@@ -64,52 +52,19 @@ final class SenseVoiceService {
 
     func transcribe(
         audioFileURL: URL,
-        language: String? = nil,
         completion: @escaping (Result<String, WhisperError>) -> Void
     ) {
-        guard fileManager.fileExists(atPath: audioFileURL.path) else {
+        guard FileManager.default.fileExists(atPath: audioFileURL.path) else {
             completion(.failure(.invalidAudioFile))
             return
         }
 
-        guard let modelDir = bundledModelDir else {
+        guard let modelDir = Bundle.main.resourcePath else {
             AppLogger.transcription.error("SenseVoiceService: bundled model directory not found")
             completion(.failure(.modelDownloadFailed))
             return
         }
 
-        // If wrapper is nil (model not yet loaded), attempt one reload before transcribing
-        if wrapper == nil {
-            AppLogger.transcription.info("SenseVoiceService: wrapper nil at transcribe call, attempting reload before transcription")
-            modelQueue.async { [weak self] in
-                guard let self = self else { return }
-                if self.wrapper == nil {
-                    self.wrapper = SenseVoiceCppWrapper(modelDir: modelDir)
-                    if self.wrapper != nil {
-                        AppLogger.transcription.info("SenseVoiceService: reload succeeded")
-                        DispatchQueue.main.async { self.isModelLoaded = true }
-                    } else {
-                        AppLogger.transcription.error("SenseVoiceService: reload failed, returning modelDownloadFailed")
-                        DispatchQueue.main.async { completion(.failure(.modelDownloadFailed)) }
-                        return
-                    }
-                }
-                self.runTranscription(modelDir: modelDir, audioFileURL: audioFileURL, language: language, completion: completion)
-            }
-            return
-        }
-
-        runTranscription(modelDir: modelDir, audioFileURL: audioFileURL, language: language, completion: completion)
-    }
-
-    // MARK: - Transcription
-
-    private func runTranscription(
-        modelDir: String,
-        audioFileURL: URL,
-        language: String?,
-        completion: @escaping (Result<String, WhisperError>) -> Void
-    ) {
         AppLogger.transcription.info("SenseVoiceService: starting transcription")
         modelQueue.async { [weak self] in
             guard let self = self else { return }
@@ -132,23 +87,12 @@ final class SenseVoiceService {
                 }
             }
 
-            // Load model if needed
-            if self.wrapper == nil {
-                AppLogger.transcription.info("SenseVoiceService: model not loaded, attempting to load now")
-                self.wrapper = SenseVoiceCppWrapper(modelDir: modelDir)
-                if self.wrapper != nil {
-                    AppLogger.transcription.info("SenseVoiceService: model loaded successfully on demand")
-                } else {
-                    AppLogger.transcription.error("SenseVoiceService: on-demand model load failed")
-                }
-            }
-
-            guard let wrapper = self.wrapper else {
+            guard let wrapper = self.loadModelIfNeeded(from: modelDir) else {
                 DispatchQueue.main.async { completion(.failure(.modelDownloadFailed)) }
                 return
             }
 
-            guard let text = wrapper.transcribe(wavURL: wavURL, language: language) else {
+            guard let text = wrapper.transcribe(wavURL: wavURL) else {
                 AppLogger.transcription.error("SenseVoiceService: transcription returned nil result")
                 DispatchQueue.main.async { completion(.failure(.invalidResponse)) }
                 return
@@ -160,5 +104,12 @@ final class SenseVoiceService {
                 completion(.success(text))
             }
         }
+    }
+
+    private func loadModelIfNeeded(from modelDir: String) -> SenseVoiceCppWrapper? {
+        if wrapper == nil {
+            wrapper = SenseVoiceCppWrapper(modelDir: modelDir)
+        }
+        return wrapper
     }
 }

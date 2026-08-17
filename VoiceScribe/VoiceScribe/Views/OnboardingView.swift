@@ -21,8 +21,6 @@ struct OnboardingView: View {
     @State private var restartTimer: Timer? = nil
     @State private var showAccessibilityGuide: Bool = false
 
-    private let localization = LocalizationHelper.shared
-
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             if let countdown = restartCountdown {
@@ -38,30 +36,30 @@ struct OnboardingView: View {
             if restartCountdown == nil {
                 HStack {
                     if step > 0 {
-                        Button(localization.localized(.back)) {
+                        Button(String(localized: "返回")) {
                             step -= 1
                         }
-                        .accessibilityLabel(localization.localized(.onboardingBackAccessibility))
+                        .accessibilityLabel(String(localized: "返回上一步"))
                         .accessibilityHint("Go to previous step")
                     }
 
                     Spacer()
 
                     if step == 0 {
-                        Button(localization.localized(.next)) {
+                        Button(String(localized: "下一步")) {
                             stopPermissionPolling()
                             step += 1
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(!microphoneGranted || !accessibilityGranted)
-                        .accessibilityLabel(localization.localized(.onboardingNextAccessibility))
+                        .accessibilityLabel(String(localized: "前往下一步"))
                         .accessibilityHint("Continue to next step")
                     } else {
-                        Button(localization.localized(.finish)) {
+                        Button(String(localized: "完成")) {
                             onFinish()
                         }
                         .buttonStyle(.borderedProminent)
-                        .accessibilityLabel(localization.localized(.onboardingFinishAccessibility))
+                        .accessibilityLabel(String(localized: "完成設定"))
                         .accessibilityHint("Complete onboarding")
                     }
                 }
@@ -85,14 +83,14 @@ struct OnboardingView: View {
                 .font(.system(size: 64))
                 .foregroundStyle(.green)
 
-            Text(localization.localized(.onboardingPermissionsComplete))
+            Text(String(localized: "權限設定完成！"))
                 .font(.title)
                 .fontWeight(.bold)
 
-            Text(String(format: localization.localized(.onboardingRestartingCountdown), countdown))
+            Text(String(format: String(localized: "即將自動重新啟動 LaSay（%d 秒）\u{2026}"), countdown))
                 .foregroundColor(.secondary)
 
-            Text(localization.localized(.onboardingRestartHint))
+            Text(String(localized: "重啟後即可使用 Fn + Space 語音輸入"))
                 .font(.caption)
                 .foregroundColor(.secondary)
 
@@ -105,16 +103,16 @@ struct OnboardingView: View {
 
     private var permissionsStep: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(localization.localized(.onboardingPermissionsTitle))
+            Text(String(localized: "權限設定"))
                 .font(.title)
                 .fontWeight(.bold)
 
-            Text(localization.localized(.onboardingPermissionsDescription))
+            Text(String(localized: "LaSay 需要麥克風與輔助使用權限才能正常工作。"))
                 .foregroundColor(.secondary)
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text(localization.localized(.onboardingMicrophone))
+                    Text(String(localized: "麥克風"))
                         .font(.headline)
                     Spacer()
                     if microphoneGranted {
@@ -127,13 +125,13 @@ struct OnboardingView: View {
                 }
 
                 if !microphoneGranted {
-                    Button(localization.localized(.onboardingGrantMicrophone)) {
+                    Button(String(localized: "授予麥克風權限")) {
                         AudioRecorder.shared.requestMicrophonePermission { granted in
                             microphoneGranted = granted
                         }
                     }
                     .buttonStyle(.bordered)
-                    .accessibilityLabel(localization.localized(.onboardingGrantMicrophone))
+                    .accessibilityLabel(String(localized: "授予麥克風權限"))
                     .accessibilityHint("Request microphone permission")
                 }
             }
@@ -142,7 +140,7 @@ struct OnboardingView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text(localization.localized(.onboardingAccessibility))
+                    Text(String(localized: "輔助使用"))
                         .font(.headline)
                     Spacer()
                     if accessibilityGranted {
@@ -159,14 +157,14 @@ struct OnboardingView: View {
                         accessibilityGuide
                             .transition(.opacity)
                     } else {
-                        Button(localization.localized(.onboardingOpenAccessibility)) {
+                        Button(String(localized: "打開輔助使用設定")) {
                             openAccessibilitySettings()
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 showAccessibilityGuide = true
                             }
                         }
                         .buttonStyle(.bordered)
-                        .accessibilityLabel(localization.localized(.onboardingOpenAccessibility))
+                        .accessibilityLabel(String(localized: "打開輔助使用設定"))
                         .accessibilityHint("Open System Settings to grant accessibility permission")
                         .transition(.opacity)
                     }
@@ -181,20 +179,20 @@ struct OnboardingView: View {
 
     private var accessibilityGuide: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(localization.localized(.onboardingAccessibilityGuideIntro))
+            Text(String(localized: "在「系統設定」中完成以下步驟："))
                 .font(.subheadline)
                 .fontWeight(.medium)
 
             VStack(alignment: .leading, spacing: 6) {
-                guideStep(number: 1, text: localization.localized(.onboardingAccessibilityStep1))
-                guideStep(number: 2, text: localization.localized(.onboardingAccessibilityStep2))
-                guideStep(number: 3, text: localization.localized(.onboardingAccessibilityStep3))
+                guideStep(number: 1, text: String(localized: "在列表中找到「LaSay」"))
+                guideStep(number: 2, text: String(localized: "開啟旁邊的開關"))
+                guideStep(number: 3, text: String(localized: "如有提示，輸入密碼確認"))
             }
 
             HStack(alignment: .top, spacing: 4) {
                 Image(systemName: "questionmark.circle")
                     .font(.caption2)
-                Text(localization.localized(.onboardingAccessibilityNotFound))
+                Text(String(localized: "找不到的話請點擊左下角的 + 並搜尋「LaSay」新增"))
                     .font(.caption)
             }
             .foregroundColor(.secondary)
@@ -203,12 +201,12 @@ struct OnboardingView: View {
             HStack(spacing: 4) {
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .font(.caption2)
-                Text(localization.localized(.onboardingAccessibilityAutoUpdate))
+                Text(String(localized: "完成後會自動偵測"))
                     .font(.caption)
             }
             .foregroundColor(.secondary)
 
-            Button(localization.localized(.onboardingReopenSettings)) {
+            Button(String(localized: "重新打開系統設定")) {
                 openAccessibilitySettings()
             }
             .buttonStyle(.bordered)
@@ -320,14 +318,14 @@ struct OnboardingView: View {
                 .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isPulsing)
                 .onAppear { isPulsing = true }
             
-            Text(localization.localized(.onboardingTryItTitle))
+            Text(String(localized: "試試看"))
                 .font(.title)
                 .fontWeight(.bold)
 
-            Text(localization.localized(.onboardingTryItPrompt))
+            Text(String(localized: "按住 Fn + Space 試試看！"))
                 .font(.headline)
 
-            Text(localization.localized(.onboardingTryItDescription))
+            Text(String(localized: "完成後就可以開始使用 LaSay。"))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             

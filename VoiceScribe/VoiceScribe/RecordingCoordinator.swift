@@ -12,37 +12,15 @@ import AVFoundation
 import os.log
 
 final class RecordingCoordinator {
-    private let appState: AppState
-    private let audioRecorder: AudioRecorder
-    private let cloudService: WhisperService
-    private let senseVoiceService: SenseVoiceService
-    private let openAIService: OpenAIService
-    private let textInputService: TextInputService
-    private let hotkeyManager: HotkeyManager
-    private let localization: LocalizationHelper
-
+    private let appState = AppState.shared
+    private let audioRecorder = AudioRecorder.shared
+    private let cloudService = WhisperService.shared
+    private let senseVoiceService = SenseVoiceService.shared
+    private let openAIService = OpenAIService.shared
+    private let textInputService = TextInputService.shared
+    private let hotkeyManager = HotkeyManager.shared
     private var processingTimer: Timer?
     
-    init(
-        appState: AppState,
-        audioRecorder: AudioRecorder,
-        cloudService: WhisperService,
-        senseVoiceService: SenseVoiceService,
-        openAIService: OpenAIService,
-        textInputService: TextInputService,
-        hotkeyManager: HotkeyManager,
-        localization: LocalizationHelper
-    ) {
-        self.appState = appState
-        self.audioRecorder = audioRecorder
-        self.cloudService = cloudService
-        self.senseVoiceService = senseVoiceService
-        self.openAIService = openAIService
-        self.textInputService = textInputService
-        self.hotkeyManager = hotkeyManager
-        self.localization = localization
-    }
-
     func start() {
         requestNotificationPermission()
         requestMicrophonePermission()
@@ -62,11 +40,11 @@ final class RecordingCoordinator {
 
     private func showMicrophonePermissionAlert() {
         let alert = NSAlert()
-        alert.messageText = localization.localized(.microphonePermissionTitle)
-        alert.informativeText = localization.localized(.microphonePermissionMessage)
+        alert.messageText = String(localized: "需要麥克風權限")
+        alert.informativeText = String(localized: "LaSay 需要麥克風權限才能錄音。請在系統設定中允許麥克風存取。")
         alert.alertStyle = .warning
-        alert.addButton(withTitle: localization.localized(.openSystemSettings))
-        alert.addButton(withTitle: localization.localized(.cancel))
+        alert.addButton(withTitle: String(localized: "打開系統設定"))
+        alert.addButton(withTitle: String(localized: "取消"))
 
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
@@ -134,7 +112,7 @@ final class RecordingCoordinator {
         if duration < 0.5 {
             AppLogger.recording.info("Recording too short: \(duration, privacy: .public)s, deleting")
             try? FileManager.default.removeItem(at: audioURL)
-            showNotification(title: localization.localized(.recordingTooShortTitle), body: localization.localized(.recordingTooShortBody))
+            showNotification(title: String(localized: "錄音太短"), body: String(localized: "請按住 Fn+Space 說話，放開後自動辨識"))
             appState.updateStatus(.idle)
             hotkeyManager.restartMonitoring()
             return
@@ -147,8 +125,8 @@ final class RecordingCoordinator {
             AppLogger.transcription.error("RecordingCoordinator: processing timeout reached")
             DispatchQueue.main.async {
                 self.showNotification(
-                    title: self.localization.localized(.transcriptionFailed),
-                    body: self.localization.localized(.processingTimeout),
+                    title: String(localized: "語音轉錄失敗"),
+                    body: String(localized: "處理逾時。請重試。"),
                     isError: true
                 )
                 self.appState.updateStatus(.idle)
@@ -162,33 +140,15 @@ final class RecordingCoordinator {
         let languageCode = selectedLanguage.languageCode
 
         if selectedMode == .cloud {
-            // Check internet connection before proceeding
-            if !NetworkMonitor.shared.isOnline {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
-                    self.processingTimer?.invalidate()
-                    self.processingTimer = nil
-                    self.showNotification(
-                        title: self.localization.localized(.noNetworkConnection),
-                        body: self.localization.localized(.offlineCloudModeError),
-                        isError: true
-                    )
-                    self.appState.updateStatus(.idle)
-                    self.hotkeyManager.restartMonitoring()
-                    self.audioRecorder.deleteRecording(at: audioURL)
-                }
-                return
-            }
-            
-            guard let apiKey = KeychainHelper.shared.get(key: "openai_api_key"), !apiKey.isEmpty else {
+            guard KeychainHelper.shared.get(key: "openai_api_key")?.isEmpty == false else {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     self.processingTimer?.invalidate()
                     self.processingTimer = nil
                     NotificationCenter.default.post(name: NSNotification.Name("OpenSettings"), object: nil)
                     self.showNotification(
-                        title: self.localization.localized(.apiKeyRequiredTitle),
-                        body: self.localization.localized(.apiKeyRequiredBody),
+                        title: String(localized: "需要 API Key"),
+                        body: String(localized: "請在設定中輸入 OpenAI API Key 以使用雲端模式"),
                         isError: true
                     )
                     self.appState.updateStatus(.idle)
@@ -215,23 +175,18 @@ final class RecordingCoordinator {
                     self.audioRecorder.deleteRecording(at: audioURL)
 
                     if enableAIPolish {
-                        if selectedMode == .senseVoice, !NetworkMonitor.shared.isOnline {
-                            let cleaned = TextCleaner.basicCleanup(transcribedText)
-                            self.processFinalText(cleaned)
-                        } else {
-                            guard let apiKey = KeychainHelper.shared.get(key: "openai_api_key"), !apiKey.isEmpty else {
-                                self.processFinalText(transcribedText)
-                                return
-                            }
+                        guard KeychainHelper.shared.get(key: "openai_api_key")?.isEmpty == false else {
+                            self.processFinalText(transcribedText)
+                            return
+                        }
 
-                            AppLogger.transcription.info("RecordingCoordinator: AI Polish started")
-                            let customPrompt = AppSettings.shared.customSystemPrompt
-                            // Cloud 模式固定全形標點，不額外加指令拖慢 AI Polish
-                            let puncStyle: PunctuationStyle = (selectedMode == .cloud) ? .fullWidth : AppSettings.shared.punctuationStyle
+                        AppLogger.transcription.info("RecordingCoordinator: AI Polish started")
+                        let customPrompt = AppSettings.shared.customSystemPrompt
+                        // Cloud 模式固定全形標點，不額外加指令拖慢 AI Polish
+                        let puncStyle: PunctuationStyle = (selectedMode == .cloud) ? .fullWidth : AppSettings.shared.punctuationStyle
 
-                            self.polishTextWithRetry(transcribedText, customPrompt: customPrompt, punctuationStyle: puncStyle) { [weak self] finalText in
-                                self?.processFinalText(finalText)
-                            }
+                        self.polishTextWithRetry(transcribedText, customPrompt: customPrompt, punctuationStyle: puncStyle) { [weak self] finalText in
+                            self?.processFinalText(finalText)
                         }
                     } else {
                         self.processFinalText(transcribedText)
@@ -243,7 +198,7 @@ final class RecordingCoordinator {
                     self.processingTimer = nil
 
                     self.showNotification(
-                        title: self.localization.localized(.transcriptionFailed),
+                        title: String(localized: "語音轉錄失敗"),
                         body: error.localizedDescription,
                         isError: true
                     )
@@ -262,7 +217,6 @@ final class RecordingCoordinator {
         case .senseVoice:
             senseVoiceService.transcribe(
                 audioFileURL: audioURL,
-                language: languageCode,
                 completion: transcriptionHandler
             )
         case .cloud:
@@ -321,8 +275,8 @@ final class RecordingCoordinator {
                     } else {
                         AppLogger.transcription.error("AI Polish failed after \(maxRetries + 1) attempts: \(error.localizedDescription)")
                         self.showNotification(
-                            title: self.localization.localized(.aiPolishFailed),
-                            body: self.localization.localized(.usingOriginalText) + error.localizedDescription,
+                            title: String(localized: "AI 潤飾失敗"),
+                            body: String(localized: "已使用原始轉錄文字：") + error.localizedDescription,
                             isError: false
                         )
                         completion(text) // fallback to original
@@ -348,7 +302,7 @@ final class RecordingCoordinator {
                 self.processingTimer?.invalidate()
                 self.processingTimer = nil
                 self.showNotification(
-                    title: self.localization.localized(.transcriptionFailed),
+                    title: String(localized: "語音轉錄失敗"),
                     body: error.localizedDescription,
                     isError: true
                 )

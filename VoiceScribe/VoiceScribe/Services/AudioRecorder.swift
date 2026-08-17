@@ -44,10 +44,9 @@ class AudioRecorder: NSObject {
 
     /// 顯示麥克風權限被拒絕的通知
     private func showMicrophonePermissionDeniedNotification() {
-        let localization = LocalizationHelper.shared
         let content = UNMutableNotificationContent()
-        content.title = localization.localized(.microphonePermissionTitle)
-        content.body = localization.localized(.microphonePermissionDenied)
+        content.title = String(localized: "需要麥克風權限")
+        content.body = String(localized: "麥克風權限被拒絕。請前往「系統設定 > 隱私權與安全性 > 麥克風」啟用權限。")
         content.sound = .defaultCritical
 
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
