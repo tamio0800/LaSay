@@ -23,35 +23,8 @@ final class RecordingCoordinator {
     
     func start() {
         requestNotificationPermission()
-        requestMicrophonePermission()
         setupAudioRecorderCallbacks()
         setupGlobalHotkey()
-    }
-
-    // MARK: - Microphone Permission
-
-    private func requestMicrophonePermission() {
-        audioRecorder.requestMicrophonePermission { [weak self] granted in
-            if !granted {
-                self?.showMicrophonePermissionAlert()
-            }
-        }
-    }
-
-    private func showMicrophonePermissionAlert() {
-        let alert = NSAlert()
-        alert.messageText = String(localized: "需要麥克風權限")
-        alert.informativeText = String(localized: "LaSay 需要麥克風權限才能錄音。請在系統設定中允許麥克風存取。")
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: String(localized: "打開系統設定"))
-        alert.addButton(withTitle: String(localized: "取消"))
-
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone") {
-                NSWorkspace.shared.open(url)
-            }
-        }
     }
 
     // MARK: - Notification Permission
@@ -83,8 +56,8 @@ final class RecordingCoordinator {
             self?.stopRecording()
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.hotkeyManager.startMonitoring()
+        if hotkeyManager.checkAccessibilityPermission() {
+            hotkeyManager.startMonitoring()
         }
     }
 

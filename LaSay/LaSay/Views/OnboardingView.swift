@@ -14,18 +14,13 @@ struct OnboardingView: View {
     @State private var step: Int = 0
     @State private var microphoneGranted: Bool = AudioRecorder.shared.checkMicrophonePermission()
     @State private var accessibilityGranted: Bool = HotkeyManager.shared.checkAccessibilityPermission()
-    @State private var refreshUI: Bool = false
     @State private var isPulsing: Bool = false
     @State private var permissionTimer: Timer? = nil
-    @State private var restartCountdown: Int? = nil
-    @State private var restartTimer: Timer? = nil
     @State private var showAccessibilityGuide: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            if let countdown = restartCountdown {
-                restartingView(countdown: countdown)
-            } else if step == 0 {
+            if step == 0 {
                 permissionsStep
             } else {
                 tryItStep
@@ -33,70 +28,41 @@ struct OnboardingView: View {
 
             Spacer()
 
-            if restartCountdown == nil {
-                HStack {
-                    if step > 0 {
-                        Button(String(localized: "返回")) {
-                            step -= 1
-                        }
-                        .accessibilityLabel(String(localized: "返回上一步"))
-                        .accessibilityHint("Go to previous step")
+            HStack {
+                if step > 0 {
+                    Button(String(localized: "返回")) {
+                        step -= 1
                     }
+                    .accessibilityLabel(String(localized: "返回上一步"))
+                    .accessibilityHint("Go to previous step")
+                }
 
-                    Spacer()
+                Spacer()
 
-                    if step == 0 {
-                        Button(String(localized: "下一步")) {
-                            stopPermissionPolling()
-                            step += 1
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(!microphoneGranted || !accessibilityGranted)
-                        .accessibilityLabel(String(localized: "前往下一步"))
-                        .accessibilityHint("Continue to next step")
-                    } else {
-                        Button(String(localized: "完成")) {
-                            onFinish()
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .accessibilityLabel(String(localized: "完成設定"))
-                        .accessibilityHint("Complete onboarding")
+                if step == 0 {
+                    Button(String(localized: "下一步")) {
+                        stopPermissionPolling()
+                        step += 1
                     }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!microphoneGranted || !accessibilityGranted)
+                    .accessibilityLabel(String(localized: "前往下一步"))
+                    .accessibilityHint("Continue to next step")
+                } else {
+                    Button(String(localized: "完成")) {
+                        onFinish()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityLabel(String(localized: "完成設定"))
+                    .accessibilityHint("Complete onboarding")
                 }
             }
         }
         .padding(28)
         .frame(width: 460, height: 420)
-        .id(refreshUI)
         .onAppear {
             applyDefaultModeIfNeeded()
         }
-    }
-
-    // MARK: - Restarting View
-
-    private func restartingView(countdown: Int) -> some View {
-        VStack(spacing: 16) {
-            Spacer()
-
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.green)
-
-            Text(String(localized: "權限設定完成！"))
-                .font(.title)
-                .fontWeight(.bold)
-
-            Text(String(format: String(localized: "即將自動重新啟動 LaSay（%d 秒）\u{2026}"), countdown))
-                .foregroundColor(.secondary)
-
-            Text(String(localized: "重啟後即可使用 Fn + Space 語音輸入"))
-                .font(.caption)
-                .foregroundColor(.secondary)
-
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Permissions Step
@@ -250,17 +216,13 @@ struct OnboardingView: View {
                 let newMic = AudioRecorder.shared.checkMicrophonePermission()
                 let newAccessibility = HotkeyManager.shared.checkAccessibilityPermission()
 
-                // Detect both permissions granted (either just now or already)
-                let bothGrantedNow = newMic && newAccessibility
-                let bothGrantedBefore = microphoneGranted && accessibilityGranted
+                let accessibilityWasGranted = accessibilityGranted
 
                 microphoneGranted = newMic
                 accessibilityGranted = newAccessibility
 
-                // Trigger restart when both become granted (transition from not-both to both)
-                if bothGrantedNow && !bothGrantedBefore {
-                    stopPermissionPolling()
-                    startRestartCountdown()
+                if newAccessibility && !accessibilityWasGranted {
+                    HotkeyManager.shared.startMonitoring()
                 }
             }
         }
@@ -269,40 +231,6 @@ struct OnboardingView: View {
     private func stopPermissionPolling() {
         permissionTimer?.invalidate()
         permissionTimer = nil
-    }
-
-    // MARK: - Auto-Restart
-
-    private func startRestartCountdown() {
-        // Mark onboarding as complete
-        AppSettings.shared.hasLaunchedBefore = true
-
-        restartCountdown = 3
-        restartTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            DispatchQueue.main.async {
-                guard let current = restartCountdown else {
-                    timer.invalidate()
-                    return
-                }
-                if current <= 1 {
-                    timer.invalidate()
-                    restartApp()
-                } else {
-                    restartCountdown = current - 1
-                }
-            }
-        }
-    }
-
-    private func restartApp() {
-        guard let bundleURL = Bundle.main.bundleURL as URL? else { return }
-        let config = NSWorkspace.OpenConfiguration()
-        config.createsNewApplicationInstance = true
-        NSWorkspace.shared.openApplication(at: bundleURL, configuration: config) { _, _ in
-            DispatchQueue.main.async {
-                NSApp.terminate(nil)
-            }
-        }
     }
 
     // MARK: - Try It Step

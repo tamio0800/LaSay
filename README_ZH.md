@@ -75,6 +75,8 @@ LaSay 需要兩個 macOS 權限：
 - **麥克風** -- 系統設定 > 隱私權與安全性 > 麥克風
 - **輔助使用** -- 系統設定 > 隱私權與安全性 > 輔助使用（全域快捷鍵需要）
 
+首次設定各授予一次即可；LaSay 會立即啟用快捷鍵，不需要重新啟動。
+
 ### 設定選項
 
 從 menu bar 圖示 > 設定進入：
@@ -111,7 +113,7 @@ LaSay 需要兩個 macOS 權限：
 ## 常見問題
 
 **快捷鍵沒反應？**
-授予輔助使用權限後需要重啟 LaSay。這是 macOS 的限制。
+開啟 LaSay 並依照權限設定操作；授予輔助使用權限後，快捷鍵會立即生效。
 
 **Terminal 能用嗎？**
 可以，透過模擬 Cmd+V 貼上。部分終端模擬器可能需要額外設定。
@@ -131,6 +133,10 @@ macOS Keychain（透過 Security framework）。不在 UserDefaults，不在明�
 - Apple Silicon 或 Intel Mac
 - 網路連線（僅雲端模式）
 - OpenAI API Key（雲端模式和 AI 清理）
+
+## 從原始碼建置
+
+請在 Xcode 選擇 Apple Development signing team。不要使用 ad-hoc 簽章，否則每次 rebuild 後 App 身分會改變，macOS 可能要求重新授予隱私權限。
 
 ## 授權
 

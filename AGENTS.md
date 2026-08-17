@@ -8,10 +8,11 @@ This repository contains the LaSay macOS menu-bar app. The Xcode project is at `
 
 - `open LaSay/LaSay.xcodeproj` opens the project for normal development.
 - `xcodebuild -project LaSay/LaSay.xcodeproj -scheme LaSay -configuration Debug build` performs a command-line debug build.
+- `xcodebuild -project LaSay/LaSay.xcodeproj -scheme LaSay test` runs the XCTest suite.
 - `xcodebuild -project LaSay/LaSay.xcodeproj -scheme LaSay clean build` checks a clean build before submission.
 - `./package-dmg.sh [beta]` packages an existing Release build; it requires `create-dmg` and expects the app under `LaSay/build/Build/Products/Release/`.
 
-Run XCTest cases with Xcode's Product > Test (`Cmd+U`). The checked-in project currently exposes only the application target, so ensure test files are attached to a test target before relying on CLI test runs.
+Run XCTest cases with Xcode's Product > Test (`Cmd+U`) or the command above.
 
 ## Coding Style & Naming Conventions
 

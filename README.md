@@ -79,6 +79,8 @@ LaSay requires two macOS permissions:
 - **Microphone** -- System Settings > Privacy & Security > Microphone
 - **Accessibility** -- System Settings > Privacy & Security > Accessibility (for global hotkey)
 
+Grant both once in onboarding. LaSay activates the hotkey immediately; no restart is required.
+
 ### Settings
 
 Access via menu bar icon > Settings:
@@ -115,7 +117,7 @@ UI: Traditional Chinese, English
 ## FAQ
 
 **Hotkey not working?**
-Grant Accessibility permission and restart LaSay. macOS requires a restart after granting this permission.
+Open LaSay and follow the permission setup. The hotkey activates as soon as Accessibility access is granted.
 
 **Works in Terminal?**
 Yes, via simulated Cmd+V paste. Some terminal emulators may require additional configuration.
@@ -145,7 +147,7 @@ open LaSay.xcodeproj
 # Xcode → Product → Build (Cmd+B)
 ```
 
-No CocoaPods or SPM setup is required; the pinned native runtime and model are bundled.
+Use an Apple Development signing team in Xcode. Ad-hoc signing changes the app's identity after rebuilds and causes macOS privacy permissions to reset. No CocoaPods or SPM setup is required; the pinned native runtime and model are bundled.
 
 ## License
 

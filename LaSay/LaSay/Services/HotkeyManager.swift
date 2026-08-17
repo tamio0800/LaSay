@@ -55,11 +55,7 @@ class HotkeyManager {
     func startMonitoring() {
         AppLogger.ui.info("HotkeyManager: starting hotkey monitoring")
 
-        // 檢查權限（使用 prompt 選項強制請求）
-        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true]
-        let hasPermission = AXIsProcessTrustedWithOptions(options)
-
-        guard hasPermission else {
+        guard checkAccessibilityPermission() else {
             AppLogger.ui.error("HotkeyManager: accessibility permission not granted, cannot start monitoring")
             return
         }
