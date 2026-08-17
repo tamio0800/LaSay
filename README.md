@@ -140,8 +140,8 @@ In macOS Keychain via the Security framework. Not in UserDefaults, not in plaint
 
 ```bash
 git clone https://github.com/tamiotsiuopen/LaSay.git
-cd LaSay/VoiceScribe
-open VoiceScribe.xcodeproj
+cd LaSay/LaSay
+open LaSay.xcodeproj
 # Xcode → Product → Build (Cmd+B)
 ```
 

@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 
 # 專案路徑
 PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
-APP_PATH="${PROJECT_ROOT}/VoiceScribe/build/Build/Products/Release/LaSay.app"
+APP_PATH="${PROJECT_ROOT}/LaSay/build/Build/Products/Release/LaSay.app"
 ICON_PATH="${PROJECT_ROOT}/lasay-icon.png"
 
 # 檢查 app 是否存在

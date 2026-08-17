@@ -1,6 +1,6 @@
 //
 //  WhisperBridge-Bridging-Header.h
-//  VoiceScribe
+//  LaSay
 //
 
 #include "c-api.h"

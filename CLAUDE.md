@@ -13,11 +13,11 @@ LaSay 是一款 macOS 原生的系統級語音輸入工具，使用者可透過�
 ### 構建與運行
 ```bash
 # 在 Xcode 中開啟專案
-open VoiceScribe/VoiceScribe.xcodeproj
+open LaSay/LaSay.xcodeproj
 
-# 或使用 xcodebuild（從 VoiceScribe/VoiceScribe/ 目錄）
-cd VoiceScribe/VoiceScribe
-xcodebuild -scheme VoiceScribe -configuration Release
+# 或使用 xcodebuild（從 LaSay/LaSay/ 目錄）
+cd LaSay/LaSay
+xcodebuild -scheme LaSay -configuration Release
 ```
 
 ### 測試運行
@@ -25,7 +25,7 @@ xcodebuild -scheme VoiceScribe -configuration Release
 
 ### 清理構建產物
 ```bash
-cd VoiceScribe/VoiceScribe
+cd LaSay/LaSay
 rm -rf build/
 ```
 
@@ -33,7 +33,7 @@ rm -rf build/
 
 ### 應用類型與入口
 - **Menu Bar App**：使用 AppDelegate 管理，無主視窗
-- 入口點：`VoiceScribeApp.swift` (SwiftUI @main) + `AppDelegate.swift` (NSApplicationDelegate)
+- 入口點：`LaSayApp.swift` (SwiftUI @main) + `AppDelegate.swift` (NSApplicationDelegate)
 - UI 框架：SwiftUI (SettingsView) + AppKit (Menu Bar)
 
 ### 狀態管理

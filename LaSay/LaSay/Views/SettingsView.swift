@@ -1,6 +1,6 @@
 //
 //  SettingsView.swift
-//  VoiceScribe
+//  LaSay
 //
 //  Created by Tamio Tsiu on 2026/1/25.
 //

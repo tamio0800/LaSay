@@ -1,6 +1,6 @@
 //
-//  VoiceScribeApp.swift
-//  VoiceScribe
+//  LaSayApp.swift
+//  LaSay
 //
 //  Created by tamiotsiu on 2026/1/25.
 //

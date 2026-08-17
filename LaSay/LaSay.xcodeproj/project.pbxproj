@@ -26,35 +26,35 @@
 			containerPortal = 31E4AED42F262512002093FB /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 31E4AEDB2F262512002093FB;
-			remoteInfo = VoiceScribe;
+			remoteInfo = LaSay;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		31E4AEDC2F262512002093FB /* VoiceScribe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = VoiceScribe.app; path = LaSay.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA0000010000000000000001 /* VoiceScribeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VoiceScribeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB00000100000001 /* libsherpa-onnx-c-api.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-c-api.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libsherpa-onnx-c-api.a"; sourceTree = "<group>"; };
-		BB00000100000002 /* libsherpa-onnx-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-core.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libsherpa-onnx-core.a"; sourceTree = "<group>"; };
-		BB00000100000003 /* libonnxruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libonnxruntime.a; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libonnxruntime.a"; sourceTree = "<group>"; };
-		BB00000100000004 /* libkaldi-native-fbank-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkaldi-native-fbank-core.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libkaldi-native-fbank-core.a"; sourceTree = "<group>"; };
-		BB00000100000005 /* libssentencepiece_core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssentencepiece_core.a; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libssentencepiece_core.a"; sourceTree = "<group>"; };
-		BB00000100000006 /* libkaldi-decoder-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkaldi-decoder-core.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libkaldi-decoder-core.a"; sourceTree = "<group>"; };
-		BB00000100000007 /* libsherpa-onnx-fst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-fst.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libsherpa-onnx-fst.a"; sourceTree = "<group>"; };
-		BB00000100000008 /* libsherpa-onnx-fstfar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-fstfar.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libsherpa-onnx-fstfar.a"; sourceTree = "<group>"; };
-		BB00000100000009 /* libsherpa-onnx-kaldifst-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-kaldifst-core.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libsherpa-onnx-kaldifst-core.a"; sourceTree = "<group>"; };
-		BB0000010000000D /* libkissfft-float.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkissfft-float.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libkissfft-float.a"; sourceTree = "<group>"; };
-		BB0000010000000E /* libsherpa-onnx-cxx-api.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-cxx-api.a"; path = "VoiceScribe/Libraries/sherpa-onnx/lib/libsherpa-onnx-cxx-api.a"; sourceTree = "<group>"; };
+		31E4AEDC2F262512002093FB /* LaSay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = LaSay.app; path = LaSay.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000010000000000000001 /* LaSayTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LaSayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB00000100000001 /* libsherpa-onnx-c-api.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-c-api.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libsherpa-onnx-c-api.a"; sourceTree = "<group>"; };
+		BB00000100000002 /* libsherpa-onnx-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-core.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libsherpa-onnx-core.a"; sourceTree = "<group>"; };
+		BB00000100000003 /* libonnxruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libonnxruntime.a; path = "LaSay/Libraries/sherpa-onnx/lib/libonnxruntime.a"; sourceTree = "<group>"; };
+		BB00000100000004 /* libkaldi-native-fbank-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkaldi-native-fbank-core.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libkaldi-native-fbank-core.a"; sourceTree = "<group>"; };
+		BB00000100000005 /* libssentencepiece_core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssentencepiece_core.a; path = "LaSay/Libraries/sherpa-onnx/lib/libssentencepiece_core.a"; sourceTree = "<group>"; };
+		BB00000100000006 /* libkaldi-decoder-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkaldi-decoder-core.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libkaldi-decoder-core.a"; sourceTree = "<group>"; };
+		BB00000100000007 /* libsherpa-onnx-fst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-fst.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libsherpa-onnx-fst.a"; sourceTree = "<group>"; };
+		BB00000100000008 /* libsherpa-onnx-fstfar.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-fstfar.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libsherpa-onnx-fstfar.a"; sourceTree = "<group>"; };
+		BB00000100000009 /* libsherpa-onnx-kaldifst-core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-kaldifst-core.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libsherpa-onnx-kaldifst-core.a"; sourceTree = "<group>"; };
+		BB0000010000000D /* libkissfft-float.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libkissfft-float.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libkissfft-float.a"; sourceTree = "<group>"; };
+		BB0000010000000E /* libsherpa-onnx-cxx-api.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-cxx-api.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libsherpa-onnx-cxx-api.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		31E4AEDE2F262512002093FB /* VoiceScribe */ = {
+		31E4AEDE2F262512002093FB /* LaSay */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = VoiceScribe;
+			path = LaSay;
 			sourceTree = "<group>";
 		};
-		AA0000010000000000000002 /* VoiceScribeTests */ = {
+		AA0000010000000000000002 /* LaSayTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = VoiceScribeTests;
+			path = LaSayTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -91,8 +91,8 @@
 		31E4AED32F262512002093FB = {
 			isa = PBXGroup;
 			children = (
-				31E4AEDE2F262512002093FB /* VoiceScribe */,
-				AA0000010000000000000002 /* VoiceScribeTests */,
+				31E4AEDE2F262512002093FB /* LaSay */,
+				AA0000010000000000000002 /* LaSayTests */,
 				31E4AEDD2F262512002093FB /* Products */,
 				BB00000300000001 /* Frameworks */,
 			);
@@ -101,8 +101,8 @@
 		31E4AEDD2F262512002093FB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				31E4AEDC2F262512002093FB /* VoiceScribe.app */,
-				AA0000010000000000000001 /* VoiceScribeTests.xctest */,
+				31E4AEDC2F262512002093FB /* LaSay.app */,
+				AA0000010000000000000001 /* LaSayTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -128,9 +128,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		31E4AEDB2F262512002093FB /* VoiceScribe */ = {
+		31E4AEDB2F262512002093FB /* LaSay */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 31E4AEE72F262513002093FB /* Build configuration list for PBXNativeTarget "VoiceScribe" */;
+			buildConfigurationList = 31E4AEE72F262513002093FB /* Build configuration list for PBXNativeTarget "LaSay" */;
 			buildPhases = (
 				31E4AED82F262512002093FB /* Sources */,
 				31E4AED92F262512002093FB /* Frameworks */,
@@ -141,18 +141,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				31E4AEDE2F262512002093FB /* VoiceScribe */,
+				31E4AEDE2F262512002093FB /* LaSay */,
 			);
-			name = VoiceScribe;
+			name = LaSay;
 			packageProductDependencies = (
 			);
-			productName = VoiceScribe;
-			productReference = 31E4AEDC2F262512002093FB /* VoiceScribe.app */;
+			productName = LaSay;
+			productReference = 31E4AEDC2F262512002093FB /* LaSay.app */;
 			productType = "com.apple.product-type.application";
 		};
-		AA0000010000000000000006 /* VoiceScribeTests */ = {
+		AA0000010000000000000006 /* LaSayTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA0000010000000000000009 /* Build configuration list for PBXNativeTarget "VoiceScribeTests" */;
+			buildConfigurationList = AA0000010000000000000009 /* Build configuration list for PBXNativeTarget "LaSayTests" */;
 			buildPhases = (
 				AA0000010000000000000005 /* Sources */,
 				AA0000010000000000000003 /* Frameworks */,
@@ -164,13 +164,13 @@
 				AA000001000000000000000B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				AA0000010000000000000002 /* VoiceScribeTests */,
+				AA0000010000000000000002 /* LaSayTests */,
 			);
-			name = VoiceScribeTests;
+			name = LaSayTests;
 			packageProductDependencies = (
 			);
-			productName = VoiceScribeTests;
-			productReference = AA0000010000000000000001 /* VoiceScribeTests.xctest */;
+			productName = LaSayTests;
+			productReference = AA0000010000000000000001 /* LaSayTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -192,7 +192,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 31E4AED72F262512002093FB /* Build configuration list for PBXProject "VoiceScribe" */;
+			buildConfigurationList = 31E4AED72F262512002093FB /* Build configuration list for PBXProject "LaSay" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -207,8 +207,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				31E4AEDB2F262512002093FB /* VoiceScribe */,
-				AA0000010000000000000006 /* VoiceScribeTests */,
+				31E4AEDB2F262512002093FB /* LaSay */,
+				AA0000010000000000000006 /* LaSayTests */,
 			);
 		};
 /* End PBXProject section */
@@ -250,7 +250,7 @@
 /* Begin PBXTargetDependency section */
 		AA000001000000000000000B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 31E4AEDB2F262512002093FB /* VoiceScribe */;
+			target = 31E4AEDB2F262512002093FB /* LaSay */;
 			targetProxy = AA000001000000000000000A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -398,7 +398,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/VoiceScribe/Libraries/sherpa-onnx/include";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/LaSay/Libraries/sherpa-onnx/include";
 				INFOPLIST_KEY_CFBundleDisplayName = LaSay;
 				INFOPLIST_KEY_CFBundleName = LaSay;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -411,7 +411,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/VoiceScribe/Libraries/sherpa-onnx/lib",
+					"$(PROJECT_DIR)/LaSay/Libraries/sherpa-onnx/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MARKETING_VERSION = 1.1;
@@ -426,7 +426,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "VoiceScribe/LaSay-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "LaSay/LaSay-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -454,7 +454,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/VoiceScribe/Libraries/sherpa-onnx/include";
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/LaSay/Libraries/sherpa-onnx/include";
 				INFOPLIST_KEY_CFBundleDisplayName = LaSay;
 				INFOPLIST_KEY_CFBundleName = LaSay;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -467,7 +467,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/VoiceScribe/Libraries/sherpa-onnx/lib",
+					"$(PROJECT_DIR)/LaSay/Libraries/sherpa-onnx/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MARKETING_VERSION = 1.1;
@@ -482,7 +482,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "VoiceScribe/LaSay-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "LaSay/LaSay-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -523,7 +523,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		31E4AED72F262512002093FB /* Build configuration list for PBXProject "VoiceScribe" */ = {
+		31E4AED72F262512002093FB /* Build configuration list for PBXProject "LaSay" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				31E4AEE52F262513002093FB /* Debug */,
@@ -532,7 +532,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		31E4AEE72F262513002093FB /* Build configuration list for PBXNativeTarget "VoiceScribe" */ = {
+		31E4AEE72F262513002093FB /* Build configuration list for PBXNativeTarget "LaSay" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				31E4AEE82F262513002093FB /* Debug */,
@@ -541,7 +541,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AA0000010000000000000009 /* Build configuration list for PBXNativeTarget "VoiceScribeTests" */ = {
+		AA0000010000000000000009 /* Build configuration list for PBXNativeTarget "LaSayTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA0000010000000000000007 /* Debug */,

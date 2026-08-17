@@ -2,14 +2,14 @@
 
 ## Project Structure & Module Organization
 
-This repository contains the LaSay macOS menu-bar app. The Xcode project is at `VoiceScribe/VoiceScribe.xcodeproj`; application code lives under `VoiceScribe/VoiceScribe/`. Keep SwiftUI screens in `Views/`, transcription and system integrations in `Services/`, persisted state in `Models/`, and focused helpers in `Utilities/`. App icons belong in `Assets.xcassets`; bundled speech models and native `sherpa-onnx` headers/libraries live in `Resources/` and `Libraries/`. XCTest sources are in `VoiceScribe/VoiceScribeTests/`.
+This repository contains the LaSay macOS menu-bar app. The Xcode project is at `LaSay/LaSay.xcodeproj`; application code lives under `LaSay/LaSay/`. Keep SwiftUI screens in `Views/`, transcription and system integrations in `Services/`, persisted state in `Models/`, and focused helpers in `Utilities/`. App icons belong in `Assets.xcassets`; bundled speech models and native `sherpa-onnx` headers/libraries live in `Resources/` and `Libraries/`. XCTest sources are in `LaSay/LaSayTests/`.
 
 ## Build, Test, and Development Commands
 
-- `open VoiceScribe/VoiceScribe.xcodeproj` opens the project for normal development.
-- `xcodebuild -project VoiceScribe/VoiceScribe.xcodeproj -scheme VoiceScribe -configuration Debug build` performs a command-line debug build.
-- `xcodebuild -project VoiceScribe/VoiceScribe.xcodeproj -scheme VoiceScribe clean build` checks a clean build before submission.
-- `./package-dmg.sh [beta]` packages an existing Release build; it requires `create-dmg` and expects the app under `VoiceScribe/build/Build/Products/Release/`.
+- `open LaSay/LaSay.xcodeproj` opens the project for normal development.
+- `xcodebuild -project LaSay/LaSay.xcodeproj -scheme LaSay -configuration Debug build` performs a command-line debug build.
+- `xcodebuild -project LaSay/LaSay.xcodeproj -scheme LaSay clean build` checks a clean build before submission.
+- `./package-dmg.sh [beta]` packages an existing Release build; it requires `create-dmg` and expects the app under `LaSay/build/Build/Products/Release/`.
 
 Run XCTest cases with Xcode's Product > Test (`Cmd+U`). The checked-in project currently exposes only the application target, so ensure test files are attached to a test target before relying on CLI test runs.
 
@@ -19,7 +19,7 @@ Use Swift 5 conventions and four-space indentation. Name types in `UpperCamelCas
 
 ## Testing Guidelines
 
-Tests use XCTest with `@testable import VoiceScribe`. Add focused regression tests beside the existing `*Tests.swift` files. Isolate `UserDefaults`, Keychain, network, and other shared state in setup/teardown so tests remain repeatable. There is no stated coverage threshold; prioritize changed branches and failure paths.
+Tests use XCTest with `@testable import LaSay`. Add focused regression tests beside the existing `*Tests.swift` files. Isolate `UserDefaults`, Keychain, network, and other shared state in setup/teardown so tests remain repeatable. There is no stated coverage threshold; prioritize changed branches and failure paths.
 
 ## Commit & Pull Request Guidelines
 

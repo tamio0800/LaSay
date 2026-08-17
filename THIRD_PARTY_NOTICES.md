@@ -39,5 +39,5 @@ disabled. This intentionally excludes eSpeak NG, Piper Phonemize, and libucd.
 | nlohmann/json 3.12.0 | MIT | <https://github.com/nlohmann/json> |
 
 Full license texts and required copyright notices are included in
-`VoiceScribe/VoiceScribe/Resources/ThirdPartyLicenses/` and in distributed app
+`LaSay/LaSay/Resources/ThirdPartyLicenses/` and in distributed app
 bundles.

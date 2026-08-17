@@ -1,6 +1,6 @@
 //
 //  TranscriptionOptions.swift
-//  VoiceScribe
+//  LaSay
 //
 //  Created by Tamio Tsiu on 2026/2/15.
 //
