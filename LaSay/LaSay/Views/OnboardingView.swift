@@ -123,15 +123,15 @@ struct OnboardingView: View {
                         accessibilityGuide
                             .transition(.opacity)
                     } else {
-                        Button(String(localized: "打開輔助使用設定")) {
-                            openAccessibilitySettings()
+                        Button(String(localized: "授予輔助使用權限")) {
+                            HotkeyManager.shared.requestAccessibilityPermission()
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 showAccessibilityGuide = true
                             }
                         }
                         .buttonStyle(.bordered)
-                        .accessibilityLabel(String(localized: "打開輔助使用設定"))
-                        .accessibilityHint("Open System Settings to grant accessibility permission")
+                        .accessibilityLabel(String(localized: "授予輔助使用權限"))
+                        .accessibilityHint("Request accessibility permission")
                         .transition(.opacity)
                     }
                 }
@@ -145,20 +145,20 @@ struct OnboardingView: View {
 
     private var accessibilityGuide: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "在「系統設定」中完成以下步驟："))
+            Text(String(localized: "在系統提示中完成以下步驟："))
                 .font(.subheadline)
                 .fontWeight(.medium)
 
             VStack(alignment: .leading, spacing: 6) {
-                guideStep(number: 1, text: String(localized: "在列表中找到「LaSay」"))
-                guideStep(number: 2, text: String(localized: "開啟旁邊的開關"))
+                guideStep(number: 1, text: String(localized: "點擊「打開系統設定」"))
+                guideStep(number: 2, text: String(localized: "開啟「LaSay」旁邊的開關"))
                 guideStep(number: 3, text: String(localized: "如有提示，輸入密碼確認"))
             }
 
             HStack(alignment: .top, spacing: 4) {
                 Image(systemName: "questionmark.circle")
                     .font(.caption2)
-                Text(String(localized: "找不到的話請點擊左下角的 + 並搜尋「LaSay」新增"))
+                Text(String(localized: "若系統提示沒有出現，請使用下方按鈕。"))
                     .font(.caption)
             }
             .foregroundColor(.secondary)
@@ -172,7 +172,7 @@ struct OnboardingView: View {
             }
             .foregroundColor(.secondary)
 
-            Button(String(localized: "重新打開系統設定")) {
+            Button(String(localized: "直接打開系統設定")) {
                 openAccessibilitySettings()
             }
             .buttonStyle(.bordered)
@@ -201,8 +201,6 @@ struct OnboardingView: View {
     }
 
     private func openAccessibilitySettings() {
-        // Register app in Accessibility database so it appears in the list
-        HotkeyManager.shared.requestAccessibilityPermission()
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
             NSWorkspace.shared.open(url)
         }
