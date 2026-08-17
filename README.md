@@ -6,7 +6,7 @@ Voice input for developers. Dictate in your native language with English technic
 
 ![macOS](https://img.shields.io/badge/macOS-13.0+-blue)
 ![Swift](https://img.shields.io/badge/Swift-5-orange)
-![License](https://img.shields.io/badge/license-proprietary-lightgrey)
+![License](https://img.shields.io/badge/code-MIT-green)
 
 ## Why LaSay
 
@@ -20,7 +20,7 @@ Works in any app -- VS Code, Terminal, Slack, browser, anywhere you type.
 
 - **Mixed-language transcription** -- speak your native language with English technical terms
 - **300+ technical terms preserved** -- React, FastAPI, Kubernetes, camelCase identifiers, all kept intact
-- **Two transcription modes** -- Cloud (OpenAI Whisper API) or Local (whisper.cpp, fully offline)
+- **Two transcription modes** -- Cloud (OpenAI Whisper API) or Local (SenseVoice, fully offline)
 - **AI text cleanup** -- removes filler words, fixes grammar, preserves technical terms (GPT-5-mini)
 - **Global hotkey** -- Fn+Space works in any application
 - **Instant paste** -- text appears at your cursor the moment transcription completes
@@ -47,7 +47,7 @@ AudioRecorder (16kHz mono AAC)
     │
     ├─► Cloud: OpenAI Whisper API ──► transcription
     │
-    └─► Local: whisper.cpp CLI ─────► transcription
+    └─► Local: SenseVoice ──────────► transcription
                                           │
                                           ▼
                                    TechTermsDictionary
@@ -66,9 +66,9 @@ AudioRecorder (16kHz mono AAC)
 | Mode | Engine | Latency | Cost | Offline |
 |------|--------|---------|------|---------|
 | Cloud | OpenAI Whisper API | ~1-2s | ~$0.001/use | No |
-| Local | whisper.cpp (ggml-base) | ~2-4s | Free | Yes |
+| Local | SenseVoiceSmall (int8) | ~2-4s | Free | Yes |
 
-Local mode auto-downloads the whisper.cpp binary and ggml-base model (~142MB) on first use.
+The SenseVoiceSmall model is bundled with the app, so local mode requires no download.
 
 ## Configuration
 
@@ -124,7 +124,7 @@ Yes, via simulated Cmd+V paste. Some terminal emulators may require additional c
 The dictionary covers 300+ terms across major languages (Python, JavaScript, TypeScript, Swift, Rust, Java, C/C++/C#), frameworks (React, FastAPI, Django, Spring), databases (PostgreSQL, MongoDB, Redis), DevOps tools (Docker, Kubernetes, Terraform), and common abbreviations (API, SDK, CI/CD, ORM).
 
 **Can I use it without an API key?**
-Yes. Switch to Local mode -- it runs whisper.cpp entirely on your machine. AI text cleanup requires an API key.
+Yes. Switch to Local mode -- SenseVoice runs entirely on your machine. AI text cleanup requires an API key.
 
 **Where is my API key stored?**
 In macOS Keychain via the Security framework. Not in UserDefaults, not in plaintext files.
@@ -145,7 +145,13 @@ open VoiceScribe.xcodeproj
 # Xcode → Product → Build (Cmd+B)
 ```
 
-No external dependencies. No CocoaPods. No SPM packages.
+No CocoaPods or SPM setup is required; the pinned native runtime and model are bundled.
+
+## License
+
+LaSay's original source code is available under the [MIT License](LICENSE).
+The bundled SenseVoiceSmall model and native runtime retain their own licenses;
+see [Third-Party Notices](THIRD_PARTY_NOTICES.md).
 
 ---
 

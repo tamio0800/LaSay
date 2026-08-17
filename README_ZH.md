@@ -16,7 +16,7 @@
 
 - **混語言轉錄** -- 母語 + 英文技術術語混著說
 - **300+ 術語保留** -- React、FastAPI、Kubernetes、camelCase 識別字全部保留
-- **雙轉錄模式** -- 雲端（OpenAI Whisper API）或本地（whisper.cpp，完全離線）
+- **雙轉錄模式** -- 雲端（OpenAI Whisper API）或本地（SenseVoice，完全離線）
 - **AI 文字清理** -- 去贅字、修文法、保留術語（GPT-5-mini）
 - **全域快捷鍵** -- Fn+Space 在任何 app 都能用
 - **即時貼上** -- 轉錄完成的瞬間，文字出現在游標位置
@@ -43,7 +43,7 @@ AudioRecorder（16kHz mono AAC）
     │
     ├─► 雲端：OpenAI Whisper API ──► 轉錄
     │
-    └─► 本地：whisper.cpp CLI ─────► 轉錄
+    └─► 本地：SenseVoice ──────────► 轉錄
                                        │
                                        ▼
                                 TechTermsDictionary
@@ -62,9 +62,9 @@ AudioRecorder（16kHz mono AAC）
 | 模式 | 引擎 | 延遲 | 費用 | 離線 |
 |------|------|------|------|------|
 | 雲端 | OpenAI Whisper API | ~1-2 秒 | ~$0.001/次 | 否 |
-| 本地 | whisper.cpp (ggml-base) | ~2-4 秒 | 免費 | 是 |
+| 本地 | SenseVoiceSmall (int8) | ~2-4 秒 | 免費 | 是 |
 
-本地模式首次使用時自動下載 whisper.cpp 執行檔和 ggml-base 模型（約 142MB）。
+SenseVoiceSmall 模型已內建於 App，本地模式不需要另外下載。
 
 ## 設定
 
@@ -120,7 +120,7 @@ LaSay 需要兩個 macOS 權限：
 字典涵蓋 300+ 術語，橫跨主要程式語言（Python、JavaScript、TypeScript、Swift、Rust、Java、C/C++/C#）、框架（React、FastAPI、Django、Spring）、資料庫（PostgreSQL、MongoDB、Redis）、DevOps 工具（Docker、Kubernetes、Terraform）及常見縮寫（API、SDK、CI/CD、ORM）。
 
 **不用 API Key 能用嗎？**
-可以。切換到本地模式，whisper.cpp 完全在你的電腦上跑。AI 文字清理需要 API Key。
+可以。切換到本地模式，SenseVoice 完全在你的電腦上執行。AI 文字清理需要 API Key。
 
 **API Key 存在哪？**
 macOS Keychain（透過 Security framework）。不在 UserDefaults，不在明文檔案。
@@ -131,6 +131,10 @@ macOS Keychain（透過 Security framework）。不在 UserDefaults，不在明�
 - Apple Silicon 或 Intel Mac
 - 網路連線（僅雲端模式）
 - OpenAI API Key（雲端模式和 AI 清理）
+
+## 授權
+
+LaSay 原始碼採 [MIT License](LICENSE)；內建模型與第三方元件各自適用其授權。完整來源、版本與聲明請見 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ---
 
