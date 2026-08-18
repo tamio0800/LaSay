@@ -47,9 +47,22 @@
 		BB0000010000000E /* libsherpa-onnx-cxx-api.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libsherpa-onnx-cxx-api.a"; path = "LaSay/Libraries/sherpa-onnx/lib/libsherpa-onnx-cxx-api.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CC00000500000001 /* Exceptions for "LaSay" folder in "LaSay" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 31E4AEDB2F262512002093FB /* LaSay */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		31E4AEDE2F262512002093FB /* LaSay */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CC00000500000001 /* Exceptions for "LaSay" folder in "LaSay" target */,
+			);
 			path = LaSay;
 			sourceTree = "<group>";
 		};
@@ -390,7 +403,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CODE_SIGN_ENTITLEMENTS = LaSay/LaSay.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = BGRL67W69Y;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -406,19 +419,9 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/LaSay/Libraries/sherpa-onnx/include";
-				INFOPLIST_KEY_CFBundleDisplayName = LaSay;
-				INFOPLIST_KEY_CFBundleName = LaSay;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "LaSay needs microphone access to record your voice for transcription.";
-				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
-				INFOPLIST_KEY_SUEnableInstallerLauncherService = YES;
-				INFOPLIST_KEY_SUFeedURL = "https://raw.githubusercontent.com/tamio0800/LaSay/master/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "l88ZhmDBmGTbktNqs1JVRqDN5LuSiEZRlOP5/H/eJII=";
-				INFOPLIST_KEY_SUVerifyUpdateBeforeExtraction = YES;
+				INFOPLIST_FILE = LaSay/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -454,7 +457,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CODE_SIGN_ENTITLEMENTS = LaSay/LaSay.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = BGRL67W69Y;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -470,19 +473,9 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/LaSay/Libraries/sherpa-onnx/include";
-				INFOPLIST_KEY_CFBundleDisplayName = LaSay;
-				INFOPLIST_KEY_CFBundleName = LaSay;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "LaSay needs microphone access to record your voice for transcription.";
-				INFOPLIST_KEY_SUEnableAutomaticChecks = YES;
-				INFOPLIST_KEY_SUEnableInstallerLauncherService = YES;
-				INFOPLIST_KEY_SUFeedURL = "https://raw.githubusercontent.com/tamio0800/LaSay/master/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "l88ZhmDBmGTbktNqs1JVRqDN5LuSiEZRlOP5/H/eJII=";
-				INFOPLIST_KEY_SUVerifyUpdateBeforeExtraction = YES;
+				INFOPLIST_FILE = LaSay/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
