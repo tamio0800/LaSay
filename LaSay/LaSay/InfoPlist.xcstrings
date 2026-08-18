@@ -1,0 +1,23 @@
+{
+  "sourceLanguage" : "zh-Hant",
+  "strings" : {
+    "NSMicrophoneUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LaSay needs microphone access to record your voice for transcription."
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LaSay 需要麥克風權限，才能錄下你的語音並轉成文字。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

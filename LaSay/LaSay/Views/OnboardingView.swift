@@ -122,6 +122,7 @@ struct OnboardingView: View {
 
             Text(testInstruction)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             TextEditor(text: $testText)
                 .focused($testFieldFocused)
