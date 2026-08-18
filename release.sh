@@ -105,6 +105,7 @@ generate_appcast="$({
 updates_dir="$workdir/updates"
 mkdir "$updates_dir"
 ditto "$dmg" "$updates_dir/$(basename "$dmg")"
+rm -f "$root/appcast.xml"
 "$generate_appcast" \
   --download-url-prefix "https://github.com/tamio0800/LaSay/releases/download/v$version/" \
   --link 'https://github.com/tamio0800/LaSay' \
