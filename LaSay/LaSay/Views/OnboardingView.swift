@@ -38,7 +38,7 @@ struct OnboardingView: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(step == 0 ? !permissionsGranted : testText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(step == 0 ? !microphoneGranted : testText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
         .padding(28)
@@ -51,13 +51,9 @@ struct OnboardingView: View {
         }
     }
 
-    private var permissionsGranted: Bool {
-        microphoneGranted && accessibilityGranted
-    }
-
     private var permissionsStep: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Label(String(localized: "兩個權限，約一分鐘"), systemImage: "lock.open")
+            Label(String(localized: "一個必要權限，約一分鐘"), systemImage: "lock.open")
                 .font(.title2.weight(.semibold))
 
             Text(String(localized: "LaSay 只在你按住快捷鍵時錄音，並把辨識結果貼到目前的 App。"))
@@ -76,7 +72,7 @@ struct OnboardingView: View {
 
             permissionRow(
                 title: String(localized: "輔助使用"),
-                detail: String(localized: "用來接收快捷鍵並貼上文字"),
+                detail: String(localized: "用於自動貼上文字（選用）"),
                 granted: accessibilityGranted,
                 actionTitle: String(localized: "開啟系統設定")
             ) {
@@ -86,7 +82,7 @@ struct OnboardingView: View {
                 }
             }
 
-            Text(String(localized: "權限開啟後會自動繼續，不必重新啟動 App。"))
+            Text(String(localized: "沒有輔助使用權限也能使用快捷鍵；辨識結果會複製到剪貼簿，請按 Command-V 貼上。"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -124,7 +120,7 @@ struct OnboardingView: View {
             Label(String(localized: "說一句話，就設定完成"), systemImage: "waveform")
                 .font(.title2.weight(.semibold))
 
-            Text(String(format: String(localized: "點一下文字框，按住 %@ 說話，放開後 LaSay 會把結果貼進來。"), AppSettings.shared.hotkeyPreset.displayName))
+            Text(testInstruction)
                 .foregroundStyle(.secondary)
 
             TextEditor(text: $testText)
@@ -148,6 +144,13 @@ struct OnboardingView: View {
         }
     }
 
+    private var testInstruction: String {
+        if accessibilityGranted {
+            return String(format: String(localized: "點一下文字框，按住 %@ 說話，放開後 LaSay 會把結果貼進來。"), AppSettings.shared.hotkeyPreset.displayName)
+        }
+        return String(format: String(localized: "點一下文字框，按住 %@ 說話，放開後按 Command-V 貼上辨識結果。"), AppSettings.shared.hotkeyPreset.displayName)
+    }
+
     private func finish() {
         AppSettings.shared.launchAtLogin = launchAtLogin
         onFinish()
@@ -156,10 +159,8 @@ struct OnboardingView: View {
     private func startPermissionPolling() {
         permissionTimer?.invalidate()
         permissionTimer = Timer.scheduledTimer(withTimeInterval: 0.8, repeats: true) { _ in
-            let wasTrusted = accessibilityGranted
             microphoneGranted = AudioRecorder.shared.checkMicrophonePermission()
             accessibilityGranted = HotkeyManager.shared.checkAccessibilityPermission()
-            if accessibilityGranted && !wasTrusted { HotkeyManager.shared.startMonitoring() }
         }
     }
 

@@ -7,6 +7,7 @@
 
 import Cocoa
 import CoreGraphics
+import ApplicationServices
 
 class TextInputService {
     static let shared = TextInputService()
@@ -16,28 +17,38 @@ class TextInputService {
     // MARK: - Paste Text
 
     /// 將文字貼到當前游標位置
-    /// - Parameters:
-    ///   - text: 要貼上的文字
-    ///   - restoreClipboard: 是否還原原剪貼簿內容
-    func pasteText(_ text: String, restoreClipboard: Bool = true) {
-        // 備份原剪貼簿內容
-        let originalClipboard = backupClipboard()
-
-        // 寫入新文字到剪貼簿
+    /// Copies text and automatically pastes it only when Accessibility is available.
+    /// The completion receives `true` when Command-V was sent successfully.
+    func pasteText(
+        _ text: String,
+        restoreClipboard: Bool = true,
+        completion: ((Bool) -> Void)? = nil
+    ) {
+        let canAutoPaste = AXIsProcessTrusted()
+        let originalClipboard = canAutoPaste ? backupClipboard() : [:]
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(text, forType: .string)
 
-        // 延遲一下，確保剪貼簿已更新
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            // 模擬 ⌘V
-            self?.simulateCommandV()
+        guard canAutoPaste else {
+            completion?(false)
+            return
+        }
 
-            // 如果需要還原剪貼簿，延遲後還原
-            if restoreClipboard {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            guard let self else {
+                completion?(false)
+                return
+            }
+            let didAutoPaste = self.simulateCommandV()
+
+            if didAutoPaste, restoreClipboard {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self?.restoreClipboard(originalClipboard)
+                    self.restoreClipboard(originalClipboard)
+                    completion?(true)
                 }
+            } else {
+                completion?(didAutoPaste)
             }
         }
     }
@@ -81,11 +92,12 @@ class TextInputService {
     // MARK: - Keyboard Simulation
 
     /// 模擬 ⌘V 按鍵
-    private func simulateCommandV() {
+    @discardableResult
+    private func simulateCommandV() -> Bool {
         // 創建 V 鍵按下事件（keyCode 9 是 V）
         guard let keyDownEvent = CGEvent(keyboardEventSource: nil, virtualKey: 9, keyDown: true),
               let keyUpEvent = CGEvent(keyboardEventSource: nil, virtualKey: 9, keyDown: false) else {
-            return
+            return false
         }
 
         // 設定 Command 修飾鍵
@@ -95,6 +107,6 @@ class TextInputService {
         // 發送事件
         keyDownEvent.post(tap: .cghidEventTap)
         keyUpEvent.post(tap: .cghidEventTap)
-
+        return true
     }
 }

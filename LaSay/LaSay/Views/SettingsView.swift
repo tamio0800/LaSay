@@ -24,6 +24,7 @@ struct SettingsView: View {
     @State private var editingAPIKey = false
     @State private var showAPIKey = false
     @State private var showDeleteAPIKeyConfirm = false
+    @State private var accessibilityGranted = false
 
     private let keychain = KeychainHelper.shared
     private let senseVoice = SenseVoiceService.shared
@@ -86,6 +87,12 @@ struct SettingsView: View {
         .padding(24)
         .frame(width: 520, height: 580)
         .onAppear(perform: loadSettings)
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            accessibilityGranted = HotkeyManager.shared.checkAccessibilityPermission()
+            let actual = AppSettings.shared.launchAtLogin
+            launchAtLogin = actual
+            if actual { loginNeedsAttention = false }
+        }
     }
 
     private var generalSection: some View {
@@ -131,15 +138,20 @@ struct SettingsView: View {
                 .onChange(of: hotkeyPreset) { AppSettings.shared.hotkeyPreset = $0 }
             }
 
-            Toggle(String(localized: "登入後自動啟動 LaSay"), isOn: $launchAtLogin)
-                .onChange(of: launchAtLogin) { requested in
-                    AppSettings.shared.launchAtLogin = requested
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        let actual = AppSettings.shared.launchAtLogin
-                        loginNeedsAttention = actual != requested
-                        launchAtLogin = actual
+            Toggle(
+                String(localized: "登入後自動啟動 LaSay"),
+                isOn: Binding(
+                    get: { launchAtLogin },
+                    set: { requested in
+                        _ = AppSettings.shared.setLaunchAtLogin(requested)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            let actual = AppSettings.shared.launchAtLogin
+                            loginNeedsAttention = actual != requested
+                            launchAtLogin = actual
+                        }
                     }
-                }
+                )
+            )
 
             if loginNeedsAttention {
                 Button(String(localized: "在系統設定確認登入項目")) {
@@ -172,6 +184,28 @@ struct SettingsView: View {
 
     private var advancedSection: some View {
         VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Label(
+                        accessibilityGranted ? String(localized: "已啟用自動貼上") : String(localized: "未啟用自動貼上"),
+                        systemImage: accessibilityGranted ? "checkmark.circle.fill" : "doc.on.clipboard"
+                    )
+                    .foregroundStyle(accessibilityGranted ? .green : .secondary)
+                    Spacer()
+                    if !accessibilityGranted {
+                        Button(String(localized: "開啟系統設定")) {
+                            HotkeyManager.shared.requestAccessibilityPermission()
+                            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }
+                    }
+                }
+                Text(String(localized: "輔助使用是選用權限；未啟用時，辨識結果會留在剪貼簿，請按 Command-V 貼上。"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             if transcriptionMode == .senseVoice {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(String(localized: "標點符號")).font(.subheadline.weight(.medium))
@@ -316,6 +350,7 @@ struct SettingsView: View {
         aiPolishModel = AppSettings.shared.aiPolishModel
         customAIPolishModelID = AppSettings.shared.customAIPolishModelID ?? ""
         customSystemPrompt = AppSettings.shared.customSystemPrompt ?? ""
+        accessibilityGranted = HotkeyManager.shared.checkAccessibilityPermission()
         apiKey = keychain.get(key: "openai_api_key") ?? ""
         hasAPIKey = !apiKey.isEmpty
         editingAPIKey = !hasAPIKey

@@ -187,7 +187,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func checkFirstLaunch() {
         let needsOnboarding = !AppSettings.shared.hasLaunchedBefore
             || !AudioRecorder.shared.checkMicrophonePermission()
-            || !HotkeyManager.shared.checkAccessibilityPermission()
 
         if needsOnboarding {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in

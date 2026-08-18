@@ -86,16 +86,40 @@ final class AppSettings {
     var launchAtLogin: Bool {
         get { SMAppService.mainApp.status == .enabled }
         set {
-            let service = SMAppService.mainApp
-            do {
-                if newValue, service.status == .notRegistered {
+            _ = setLaunchAtLogin(newValue)
+        }
+    }
+
+    @discardableResult
+    func setLaunchAtLogin(_ enabled: Bool) -> Bool {
+        let service = SMAppService.mainApp
+        do {
+            if enabled {
+                switch service.status {
+                case .enabled:
+                    return true
+                case .notRegistered, .notFound:
                     try service.register()
-                } else if !newValue, service.status != .notRegistered {
-                    try service.unregister()
+                case .requiresApproval:
+                    SMAppService.openSystemSettingsLoginItems()
+                    return false
+                @unknown default:
+                    return false
                 }
-            } catch {
-                AppLogger.general.error("Launch at login update failed: \(error.localizedDescription, privacy: .public)")
+
+                if service.status == .requiresApproval {
+                    SMAppService.openSystemSettingsLoginItems()
+                }
+                return service.status == .enabled
             }
+
+            // Unregistering an unknown service can throw and is unnecessary.
+            guard service.status != .notRegistered, service.status != .notFound else { return true }
+            try service.unregister()
+            return true
+        } catch {
+            AppLogger.general.error("Launch at login update failed: \(error.localizedDescription, privacy: .public)")
+            return false
         }
     }
 

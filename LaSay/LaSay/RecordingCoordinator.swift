@@ -20,28 +20,38 @@ final class RecordingCoordinator {
     private let textInputService = TextInputService.shared
     private let hotkeyManager = HotkeyManager.shared
     private var processingTimer: Timer?
+    private var notificationPermissionRequested = false
     
     func start() {
-        requestNotificationPermission()
         setupAudioRecorderCallbacks()
         setupGlobalHotkey()
     }
 
     // MARK: - Notification Permission
 
-    private func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
-    }
-
     private func showNotification(title: String, body: String, isError: Bool = false) {
-        DispatchQueue.main.async {
-            let content = UNMutableNotificationContent()
-            content.title = title
-            content.body = body
-            content.sound = isError ? .defaultCritical : .default
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let center = UNUserNotificationCenter.current()
+            let enqueue = {
+                let content = UNMutableNotificationContent()
+                content.title = title
+                content.body = body
+                content.sound = isError ? .defaultCritical : .default
+                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+                center.add(request) { _ in }
+            }
 
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
-            UNUserNotificationCenter.current().add(request) { _ in }
+            guard !self.notificationPermissionRequested else {
+                enqueue()
+                return
+            }
+
+            self.notificationPermissionRequested = true
+            center.requestAuthorization(options: [.alert, .sound]) { granted, _ in
+                guard granted else { return }
+                DispatchQueue.main.async { enqueue() }
+            }
         }
     }
 
@@ -56,9 +66,7 @@ final class RecordingCoordinator {
             self?.stopRecording()
         }
 
-        if hotkeyManager.checkAccessibilityPermission() {
-            hotkeyManager.startMonitoring()
-        }
+        hotkeyManager.startMonitoring()
     }
 
     private func startRecording() {
@@ -220,7 +228,13 @@ final class RecordingCoordinator {
                 let style = AppSettings.shared.punctuationStyle
                 return PunctuationConverter.convert(techCorrected, to: style)
             }()
-            self.textInputService.pasteText(correctedText, restoreClipboard: AppSettings.shared.restoreClipboard)
+            self.textInputService.pasteText(correctedText, restoreClipboard: AppSettings.shared.restoreClipboard) { [weak self] didAutoPaste in
+                guard let self, !didAutoPaste else { return }
+                self.showNotification(
+                    title: String(localized: "文字已複製"),
+                    body: String(localized: "已複製文字，請按 Command-V 貼上")
+                )
+            }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                 self?.hotkeyManager.restartMonitoring()

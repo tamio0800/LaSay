@@ -1,6 +1,15 @@
 {
   "sourceLanguage": "zh-Hant",
   "strings": {
+    "一個必要權限，約一分鐘": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "One required permission, about one minute"}}}},
+    "點一下文字框，按住 %@ 說話，放開後按 Command-V 貼上辨識結果。": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Click the text field, hold %@ while speaking, then press Command-V to paste the result."}}}},
+    "用於自動貼上文字（選用）": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Used for automatic paste (optional)"}}}},
+    "沒有輔助使用權限也能使用快捷鍵；辨識結果會複製到剪貼簿，請按 Command-V 貼上。": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "The shortcut works without Accessibility; text will be copied to the clipboard. Press Command-V to paste."}}}},
+    "已啟用自動貼上": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Automatic paste enabled"}}}},
+    "未啟用自動貼上": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Automatic paste unavailable"}}}},
+    "輔助使用是選用權限；未啟用時，辨識結果會留在剪貼簿，請按 Command-V 貼上。": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Accessibility is optional; without it, text stays on the clipboard. Press Command-V to paste."}}}},
+    "文字已複製": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Text Copied"}}}},
+    "已複製文字，請按 Command-V 貼上": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Text copied. Press Command-V to paste."}}}},
     "LaSay 只在你按住快捷鍵時錄音，並把辨識結果貼到目前的 App。": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "LaSay records only while you hold the shortcut, then pastes the result into the current app."}}}},
     "全域快捷鍵：%@": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Global shortcut: %@"}}}},
     "請按住 %@ 說話，放開後自動辨識": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Hold %@ while speaking; release to transcribe automatically"}}}},
