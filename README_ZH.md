@@ -20,8 +20,8 @@
 
 - **混語言轉錄** -- 母語 + 英文技術術語混著說
 - **300+ 術語保留** -- React、FastAPI、Kubernetes、camelCase 識別字全部保留
-- **雙轉錄模式** -- 雲端（OpenAI Whisper API）或本地（SenseVoice，完全離線）
-- **AI 文字清理** -- 去贅字、修文法、保留術語（GPT-5-mini）
+- **雙轉錄模式** -- 雲端（OpenAI，可選模型）或本地（SenseVoice，完全離線）
+- **AI 文字清理** -- 去贅字、修文法、保留術語，可選擇 OpenAI 模型
 - **全域快捷鍵** -- Fn+Space 在任何 app 都能用
 - **即時貼上** -- 轉錄完成的瞬間，文字出現在游標位置
 - **安全儲存** -- API Key 存在 macOS Keychain
@@ -49,7 +49,7 @@ Fn+Space（按住）
     ▼
 AudioRecorder（16kHz mono AAC）
     │
-    ├─► 雲端：OpenAI Whisper API ──► 轉錄
+    ├─► 雲端：OpenAI 轉錄 API ─────► 轉錄
     │
     └─► 本地：SenseVoice ──────────► 轉錄
                                        │
@@ -59,7 +59,7 @@ AudioRecorder（16kHz mono AAC）
                                        │
                                        ▼
                                 AI 清理（選配）
-                                GPT-5-mini 文字潤飾
+                                可選 OpenAI 模型
                                        │
                                        ▼
                                 自動貼上至游標
@@ -69,7 +69,7 @@ AudioRecorder（16kHz mono AAC）
 
 | 模式 | 引擎 | 延遲 | 費用 | 離線 |
 |------|------|------|------|------|
-| 雲端 | OpenAI Whisper API | ~1-2 秒 | ~$0.001/次 | 否 |
+| 雲端 | OpenAI 轉錄 API | 依模型而異 | 依模型而異 | 否 |
 | 本地 | SenseVoiceSmall (int8) | ~2-4 秒 | 免費 | 是 |
 
 SenseVoiceSmall 模型已內建於 App，本地模式不需要另外下載。
@@ -90,6 +90,7 @@ LaSay 需要兩個 macOS 權限：
 從 menu bar 圖示 > 設定進入：
 
 - **轉錄模式** -- 雲端或本地
+- **OpenAI 模型** -- 推薦設定、指定模型或自訂 Model ID
 - **轉錄語言** -- 自動 / 中文 / 英文 / 日文 / 韓文
 - **AI 文字清理** -- 開關切換，支援自訂 prompt
 - **API Key** -- 雲端模式和 AI 清理需要
@@ -102,15 +103,7 @@ LaSay 需要兩個 macOS 權限：
 
 ## 費用
 
-使用雲端模式 + AI 清理：
-
-| 項目 | 每次費用 |
-|------|---------|
-| Whisper API | ~$0.001 |
-| GPT-5-mini（如啟用） | ~$0.00004 |
-| **合計** | **~$0.001** |
-
-每天 100 次 ≈ 每月 $3 美元。本地模式免費。
+雲端轉錄與 AI 文字清理的費用取決於所選 OpenAI 模型；本地模式免費。請在設定中依準確度、速度與費用選擇模型。
 
 ## 支援語言
 

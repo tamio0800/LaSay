@@ -90,7 +90,7 @@ final class MenuBarManager: NSObject {
 
         let status = appState.status
         let image = NSImage(systemSymbolName: status.iconName, accessibilityDescription: "LaSay")
-        image?.isTemplate = false
+        image?.isTemplate = true
 
         button.image = image
 

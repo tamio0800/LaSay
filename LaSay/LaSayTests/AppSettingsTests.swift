@@ -3,20 +3,26 @@ import XCTest
 
 @MainActor
 final class AppSettingsTests: XCTestCase {
-    private let testKey = "restore_clipboard"
+    private let testKeys = [
+        "restore_clipboard",
+        "cloud_transcription_model",
+        "custom_cloud_transcription_model_id",
+        "ai_polish_model",
+        "custom_ai_polish_model_id"
+    ]
 
     override func setUp() {
         super.setUp()
-        UserDefaults.standard.removeObject(forKey: testKey)
+        testKeys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
     }
 
     override func tearDown() {
-        UserDefaults.standard.removeObject(forKey: testKey)
+        testKeys.forEach { UserDefaults.standard.removeObject(forKey: $0) }
         super.tearDown()
     }
 
     func testRestoreClipboardDefaultsToTrue() {
-        UserDefaults.standard.removeObject(forKey: testKey)
+        UserDefaults.standard.removeObject(forKey: "restore_clipboard")
         XCTAssertTrue(AppSettings.shared.restoreClipboard, "restoreClipboard should default to true when key is absent")
     }
 
@@ -29,5 +35,31 @@ final class AppSettingsTests: XCTestCase {
         AppSettings.shared.restoreClipboard = false
         AppSettings.shared.restoreClipboard = true
         XCTAssertTrue(AppSettings.shared.restoreClipboard, "restoreClipboard should return true after being set to true")
+    }
+
+    func testCloudTranscriptionModelDefaultsToAutomatic() {
+        XCTAssertEqual(AppSettings.shared.cloudTranscriptionModel, .automatic)
+        XCTAssertEqual(AppSettings.cloudTranscriptionModelID(), "gpt-4o-transcribe")
+    }
+
+    func testCloudTranscriptionCustomModelPersists() {
+        AppSettings.shared.cloudTranscriptionModel = .custom
+        AppSettings.shared.customCloudTranscriptionModelID = "  my-transcriber  "
+
+        XCTAssertEqual(AppSettings.shared.cloudTranscriptionModel, .custom)
+        XCTAssertEqual(AppSettings.cloudTranscriptionModelID(), "my-transcriber")
+    }
+
+    func testAIPolishModelDefaultsToAutomatic() {
+        XCTAssertEqual(AppSettings.shared.aiPolishModel, .automatic)
+        XCTAssertEqual(AppSettings.aiPolishModelID(), "gpt-5.6-luna")
+    }
+
+    func testAIPolishCustomModelPersists() {
+        AppSettings.shared.aiPolishModel = .custom
+        AppSettings.shared.customAIPolishModelID = "my-polisher"
+
+        XCTAssertEqual(AppSettings.shared.aiPolishModel, .custom)
+        XCTAssertEqual(AppSettings.aiPolishModelID(), "my-polisher")
     }
 }

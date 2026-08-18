@@ -61,7 +61,7 @@ class OpenAIService {
 
     // MARK: - Polish Text
 
-    /// 使用 GPT-5-mini 優化文字
+    /// 使用選定的 OpenAI 模型優化文字
     func polishText(_ text: String, customPrompt: String? = nil, punctuationStyle: PunctuationStyle = .fullWidth, completion: @escaping (Result<String, OpenAIError>) -> Void) {
 
         // 檢查 API Key
@@ -93,9 +93,9 @@ class OpenAIService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
 
-        // 建立請求 body（使用 GPT-5-mini 的參數）
+        // 建立請求 body
         let requestBody: [String: Any] = [
-            "model": "gpt-5-mini",
+            "model": AppSettings.aiPolishModelID(),
             "messages": [
                 ["role": "system", "content": systemPrompt],
                 ["role": "user", "content": text]

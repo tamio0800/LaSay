@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="tile" x1="0.12" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#222a52"/>
+      <stop offset="0.55" stop-color="#151b36"/>
+      <stop offset="1" stop-color="#101426"/>
+    </linearGradient>
+    <linearGradient id="voice" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#62f6cd"/>
+      <stop offset="0.55" stop-color="#58cfff"/>
+      <stop offset="1" stop-color="#c9c7ff"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="30%" cy="22%" r="80%">
+      <stop offset="0" stop-color="#798cff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#798cff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="165%">
+      <feDropShadow dx="0" dy="30" stdDeviation="26" flood-color="#101629" flood-opacity="0.28"/>
+    </filter>
+    <filter id="symbolGlow" x="-20%" y="-35%" width="140%" height="170%">
+      <feDropShadow dx="0" dy="0" stdDeviation="11" flood-color="#6adfff" flood-opacity="0.32"/>
+    </filter>
+    <clipPath id="squircle"><rect x="72" y="72" width="880" height="880" rx="210"/></clipPath>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="72" width="880" height="880" rx="210" fill="url(#tile)"/>
+  </g>
+  <g clip-path="url(#squircle)">
+    <rect x="72" y="72" width="880" height="880" fill="url(#glow)"/>
+    <ellipse cx="320" cy="150" rx="380" ry="170" fill="#ffffff" opacity="0.055"/>
+  </g>
+  <rect x="73.5" y="73.5" width="877" height="877" rx="208.5" fill="none" stroke="#ffffff" stroke-opacity="0.14" stroke-width="3"/>
+
+  <g transform="translate(182 310) scale(1.45)" filter="url(#symbolGlow)">
+    <rect x="0" y="85" width="30" height="110" rx="15" fill="url(#voice)"/>
+    <rect x="64" y="42" width="30" height="196" rx="15" fill="url(#voice)"/>
+    <rect x="128" y="0" width="30" height="280" rx="15" fill="url(#voice)"/>
+    <rect x="192" y="54" width="30" height="172" rx="15" fill="url(#voice)"/>
+    <circle cx="275" cy="140" r="13" fill="#84dcff"/>
+    <circle cx="320" cy="140" r="9" fill="#a9d1ff" opacity="0.82"/>
+    <path d="M375 30H455M415 30V250M375 250H455" fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -87,7 +87,8 @@ class WhisperService {
         // 添加 model 參數
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"model\"\r\n\r\n".data(using: .utf8)!)
-        body.append("whisper-1\r\n".data(using: .utf8)!)
+        let modelID = AppSettings.cloudTranscriptionModelID()
+        body.append("\(modelID)\r\n".data(using: .utf8)!)
 
         // 如果指定語言，添加 language 參數（否則自動辨識）
         if let language = language {

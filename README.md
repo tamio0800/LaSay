@@ -24,8 +24,8 @@ Works in any app -- VS Code, Terminal, Slack, browser, anywhere you type.
 
 - **Mixed-language transcription** -- speak your native language with English technical terms
 - **300+ technical terms preserved** -- React, FastAPI, Kubernetes, camelCase identifiers, all kept intact
-- **Two transcription modes** -- Cloud (OpenAI Whisper API) or Local (SenseVoice, fully offline)
-- **AI text cleanup** -- removes filler words, fixes grammar, preserves technical terms (GPT-5-mini)
+- **Two transcription modes** -- Cloud (configurable OpenAI model) or Local (SenseVoice, fully offline)
+- **AI text cleanup** -- removes filler words, fixes grammar, and supports configurable OpenAI models
 - **Global hotkey** -- Fn+Space works in any application
 - **Instant paste** -- text appears at your cursor the moment transcription completes
 - **Secure storage** -- API keys stored in macOS Keychain
@@ -53,7 +53,7 @@ Fn+Space (hold)
     ▼
 AudioRecorder (16kHz mono AAC)
     │
-    ├─► Cloud: OpenAI Whisper API ──► transcription
+    ├─► Cloud: OpenAI Transcription API ► transcription
     │
     └─► Local: SenseVoice ──────────► transcription
                                           │
@@ -63,7 +63,7 @@ AudioRecorder (16kHz mono AAC)
                                           │
                                           ▼
                                    AI Polish (optional)
-                                   GPT-5-mini text cleanup
+                                   Configurable OpenAI model
                                           │
                                           ▼
                                    Auto-paste at cursor
@@ -73,7 +73,7 @@ AudioRecorder (16kHz mono AAC)
 
 | Mode | Engine | Latency | Cost | Offline |
 |------|--------|---------|------|---------|
-| Cloud | OpenAI Whisper API | ~1-2s | ~$0.001/use | No |
+| Cloud | OpenAI Transcription API | Model-dependent | Model-dependent | No |
 | Local | SenseVoiceSmall (int8) | ~2-4s | Free | Yes |
 
 The SenseVoiceSmall model is bundled with the app, so local mode requires no download.
@@ -94,6 +94,7 @@ Grant both once in onboarding. LaSay activates the hotkey immediately; no restar
 Access via menu bar icon > Settings:
 
 - **Transcription mode** -- Cloud or Local
+- **OpenAI models** -- recommended defaults, named choices, or a custom model ID
 - **Transcription language** -- Auto / Chinese / English / Japanese / Korean
 - **AI text cleanup** -- toggle on/off, custom prompt supported
 - **API Key** -- required for Cloud mode and AI cleanup
@@ -106,15 +107,7 @@ Stored in macOS Keychain (not UserDefaults, not plaintext).
 
 ## Cost
 
-Using Cloud mode with AI cleanup enabled:
-
-| Component | Cost per use |
-|-----------|-------------|
-| Whisper API | ~$0.001 |
-| GPT-5-mini (if enabled) | ~$0.00004 |
-| **Total** | **~$0.001** |
-
-100 uses per day = ~$3/month. Local mode is free.
+Cloud transcription and AI cleanup costs depend on the selected OpenAI models. Local mode is free; choose models in Settings based on accuracy, speed, and cost.
 
 ## Supported Languages
 

@@ -33,6 +33,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         checkFirstLaunch()
     }
 
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        openSettings()
+        return true
+    }
+
     @objc func openSettings() {
         // 如果設定視窗已經打開，直接聚焦
         if let window = settingsWindow, window.isVisible {

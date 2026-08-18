@@ -15,6 +15,11 @@ final class AppSettings {
     static let shared = AppSettings()
     private let defaults = UserDefaults.standard
 
+    nonisolated private static let cloudTranscriptionModelKey = "cloud_transcription_model"
+    nonisolated private static let customCloudTranscriptionModelIDKey = "custom_cloud_transcription_model_id"
+    nonisolated private static let aiPolishModelKey = "ai_polish_model"
+    nonisolated private static let customAIPolishModelIDKey = "custom_ai_polish_model_id"
+
     private init() {}
 
     var transcriptionMode: TranscriptionMode {
@@ -29,6 +34,62 @@ final class AppSettings {
             return lang
         }
         set { defaults.set(newValue.rawValue, forKey: "transcription_language") }
+    }
+
+    var cloudTranscriptionModel: CloudTranscriptionModel {
+        get {
+            guard let raw = defaults.string(forKey: Self.cloudTranscriptionModelKey),
+                  let model = CloudTranscriptionModel(rawValue: raw) else { return .automatic }
+            return model
+        }
+        set { defaults.set(newValue.rawValue, forKey: Self.cloudTranscriptionModelKey) }
+    }
+
+    var customCloudTranscriptionModelID: String? {
+        get { defaults.string(forKey: Self.customCloudTranscriptionModelIDKey) }
+        set { defaults.set(newValue, forKey: Self.customCloudTranscriptionModelIDKey) }
+    }
+
+    var aiPolishModel: AIPolishModel {
+        get {
+            guard let raw = defaults.string(forKey: Self.aiPolishModelKey),
+                  let model = AIPolishModel(rawValue: raw) else { return .automatic }
+            return model
+        }
+        set { defaults.set(newValue.rawValue, forKey: Self.aiPolishModelKey) }
+    }
+
+    var customAIPolishModelID: String? {
+        get { defaults.string(forKey: Self.customAIPolishModelIDKey) }
+        set { defaults.set(newValue, forKey: Self.customAIPolishModelIDKey) }
+    }
+
+    nonisolated static func cloudTranscriptionModelID() -> String {
+        modelID(
+            selectionKey: cloudTranscriptionModelKey,
+            customKey: customCloudTranscriptionModelIDKey,
+            defaultModel: CloudTranscriptionModel.gpt4oTranscribe.rawValue
+        )
+    }
+
+    nonisolated static func aiPolishModelID() -> String {
+        modelID(
+            selectionKey: aiPolishModelKey,
+            customKey: customAIPolishModelIDKey,
+            defaultModel: AIPolishModel.gpt56Luna.rawValue
+        )
+    }
+
+    private nonisolated static func modelID(selectionKey: String, customKey: String, defaultModel: String) -> String {
+        let defaults = UserDefaults.standard
+        guard let selection = defaults.string(forKey: selectionKey) else { return defaultModel }
+        if selection == "automatic" { return defaultModel }
+        if selection == "custom" {
+            let customID = defaults.string(forKey: customKey)?.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard let customID, !customID.isEmpty else { return defaultModel }
+            return customID
+        }
+        return selection
     }
 
     var punctuationStyle: PunctuationStyle {

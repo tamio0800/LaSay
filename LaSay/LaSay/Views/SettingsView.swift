@@ -17,7 +17,11 @@ struct SettingsView: View {
     @State private var customSystemPrompt: String = ""
     @State private var transcriptionMode: TranscriptionMode = .cloud
     @State private var transcriptionLanguage: TranscriptionLanguage = .auto
+    @State private var cloudTranscriptionModel: CloudTranscriptionModel = .automatic
+    @State private var customCloudTranscriptionModelID: String = ""
     @State private var punctuationStyle: PunctuationStyle = .fullWidth
+    @State private var aiPolishModel: AIPolishModel = .automatic
+    @State private var customAIPolishModelID: String = ""
     @State private var showAPIKey: Bool = false
     @State private var isAIPolishAdvancedExpanded: Bool = false
     @State private var showDeleteAPIKeyConfirm: Bool = false
@@ -139,6 +143,35 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
 
+            if transcriptionMode == .cloud {
+                HStack {
+                    Text(String(localized: "轉錄模型"))
+                    Spacer()
+                    Picker("", selection: $cloudTranscriptionModel) {
+                        ForEach(CloudTranscriptionModel.allCases, id: \.self) { model in
+                            Text(model.localizedDisplayName).tag(model)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .onChange(of: cloudTranscriptionModel) { model in
+                        AppSettings.shared.cloudTranscriptionModel = model
+                    }
+                }
+
+                Text(cloudTranscriptionModel.localizedDescription)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+
+                if cloudTranscriptionModel == .custom {
+                    TextField(String(localized: "輸入轉錄模型 ID"), text: $customCloudTranscriptionModelID)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: customCloudTranscriptionModelID) { newValue in
+                            AppSettings.shared.customCloudTranscriptionModelID = newValue
+                        }
+                }
+            }
+
             if transcriptionMode == .senseVoice && isLoadingModel {
                 HStack(spacing: 6) {
                     ProgressView()
@@ -176,9 +209,9 @@ struct SettingsView: View {
 
     private var punctuationExample: String {
         switch punctuationStyle {
-        case .fullWidth: return "範例：Hello，World。This is a test！"
-        case .halfWidth: return "範例：Hello,World.This is a test!"
-        case .spaces: return "範例：Hello World This is a test"
+        case .fullWidth: return String(localized: "範例：Hello，World。This is a test！")
+        case .halfWidth: return String(localized: "範例：Hello,World.This is a test!")
+        case .spaces: return String(localized: "範例：Hello World This is a test")
         }
     }
 
@@ -189,7 +222,7 @@ struct SettingsView: View {
             Text(String(localized: "AI 文字潤飾"))
                 .font(.headline)
 
-            Toggle(String(localized: "啟用 AI 潤飾（使用 GPT-5-mini）"), isOn: $enableAIPolish)
+            Toggle(String(localized: "啟用 AI 潤飾"), isOn: $enableAIPolish)
                 .toggleStyle(.checkbox)
                 .accessibilityLabel(String(localized: "AI 潤飾開關"))
                 .accessibilityHint(String(localized: "點擊以切換"))
@@ -206,6 +239,33 @@ struct SettingsView: View {
                 Text(String(localized: "AI 清理：移除贅字、修正文法、保留技術術語"))
                     .font(.caption)
                     .foregroundColor(.secondary)
+
+                HStack {
+                    Text(String(localized: "潤飾模型"))
+                    Spacer()
+                    Picker("", selection: $aiPolishModel) {
+                        ForEach(AIPolishModel.allCases, id: \.self) { model in
+                            Text(model.localizedDisplayName).tag(model)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .onChange(of: aiPolishModel) { model in
+                        AppSettings.shared.aiPolishModel = model
+                    }
+                }
+
+                Text(aiPolishModel.localizedDescription)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+
+                if aiPolishModel == .custom {
+                    TextField(String(localized: "輸入文字模型 ID"), text: $customAIPolishModelID)
+                        .textFieldStyle(.roundedBorder)
+                        .onChange(of: customAIPolishModelID) { newValue in
+                            AppSettings.shared.customAIPolishModelID = newValue
+                        }
+                }
 
                 DisclosureGroup(String(localized: "進階設定"), isExpanded: $isAIPolishAdvancedExpanded) {
                     VStack(alignment: .leading, spacing: 8) {
@@ -367,8 +427,12 @@ struct SettingsView: View {
 
         transcriptionMode = AppSettings.shared.transcriptionMode
         transcriptionLanguage = AppSettings.shared.transcriptionLanguage
+        cloudTranscriptionModel = AppSettings.shared.cloudTranscriptionModel
+        customCloudTranscriptionModelID = AppSettings.shared.customCloudTranscriptionModelID ?? ""
         punctuationStyle = AppSettings.shared.punctuationStyle
         enableAIPolish = AppSettings.shared.enableAIPolish
+        aiPolishModel = AppSettings.shared.aiPolishModel
+        customAIPolishModelID = AppSettings.shared.customAIPolishModelID ?? ""
         customSystemPrompt = AppSettings.shared.customSystemPrompt ?? ""
     }
 
