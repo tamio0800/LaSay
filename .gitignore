@@ -60,3 +60,8 @@ lasay-icon-transparent.png
 coverage-*
 .claude/
 rw.*.dmg
+
+# Local ASR benchmark samples and ephemeral manifests
+benchmarks/data/
+benchmarks/__pycache__/
+benchmarks/results/
