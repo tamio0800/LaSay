@@ -91,4 +91,24 @@ mounted=0
 codesign --verify --deep --strict --verbose=2 "$installed_app"
 spctl --assess --type execute --verbose=4 "$installed_app"
 
+echo '==> Generating Sparkle appcast'
+generate_appcast="$({
+  find "$HOME/Library/Developer/Xcode/DerivedData" \
+    \( \
+      -path '*/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast' \
+      -o -path '*/SourcePackages/checkouts/Sparkle/bin/generate_appcast' \
+    \) \
+    -type f -perm -111 -print -quit
+} 2>/dev/null)"
+[[ -n "$generate_appcast" ]] || fail 'Sparkle generate_appcast not found in Xcode SourcePackages'
+
+updates_dir="$workdir/updates"
+mkdir "$updates_dir"
+ditto "$dmg" "$updates_dir/$(basename "$dmg")"
+"$generate_appcast" \
+  --download-url-prefix "https://github.com/tamio0800/LaSay/releases/download/v$version/" \
+  --link 'https://github.com/tamio0800/LaSay' \
+  -o "$root/appcast.xml" \
+  "$updates_dir"
+
 printf '\nRelease verified: %s\n' "$dmg"

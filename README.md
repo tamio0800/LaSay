@@ -1,5 +1,7 @@
 # LaSay
 
+Install with Homebrew: `brew install --cask tamio0800/tap/lasay`
+
 Voice input for developers. Dictate in your native language with English technical terms -- LaSay keeps them intact.
 
 [繁體中文說明](README_ZH.md)
@@ -20,25 +22,25 @@ Developers think in mixed languages. You say "help me refactor the useEffect hoo
 
 Works in any app -- VS Code, Terminal, Slack, browser, anywhere you type.
 
+First launch: grant Microphone and Accessibility access when prompted. Hold Fn+Space to dictate, use the menu-bar icon for Settings, and signed releases can check for updates automatically.
+
 ## Features
 
 - **Mixed-language transcription** -- speak your native language with English technical terms
 - **300+ technical terms preserved** -- React, FastAPI, Kubernetes, camelCase identifiers, all kept intact
 - **Two transcription modes** -- Cloud (configurable OpenAI model) or Local (SenseVoice, fully offline)
 - **AI text cleanup** -- removes filler words, fixes grammar, and supports configurable OpenAI models
-- **Global hotkey** -- Fn+Space works in any application
+- **Configurable push-to-talk** -- Fn+Space by default; Control+Space and Option+Space are available
 - **Instant paste** -- text appears at your cursor the moment transcription completes
 - **Secure storage** -- API keys stored in macOS Keychain
 
 ## Quick Start
 
-> A signed public download is not available yet. Build from source using the instructions below.
-
 ```
-1. Install LaSay.app to /Applications
-2. Grant Microphone + Accessibility permissions on first launch
-3. Menu bar → Settings → enter your OpenAI API Key
-4. Hold Fn+Space anywhere to dictate
+1. brew install --cask tamio0800/tap/lasay
+2. Open LaSay and grant Microphone + Accessibility permissions
+3. Hold Fn+Space anywhere to dictate
+4. Optional: configure OpenAI or the shortcut from the menu-bar icon
 ```
 
 No account. No signup. No cloud sync. Your API key, your data.

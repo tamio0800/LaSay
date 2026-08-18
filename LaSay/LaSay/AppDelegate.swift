@@ -6,9 +6,15 @@
 //
 
 import Cocoa
+import Sparkle
 import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    private lazy var updaterController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: nil
+    )
     private var menuBarManager: MenuBarManager?
     private var recordingCoordinator: RecordingCoordinator?
     private var settingsWindow: NSWindow?
@@ -17,12 +23,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         menuBarManager = MenuBarManager(
             onOpenSettings: { [weak self] in self?.openSettings() },
+            onRunSetup: { [weak self] in self?.openOnboarding() },
+            onCheckForUpdates: { [weak self] in self?.updaterController.checkForUpdates(nil) },
             onShowAbout: { [weak self] in self?.showAbout() },
             onQuit: { [weak self] in self?.quitApp() }
         )
         menuBarManager?.setup()
 
         NotificationCenter.default.addObserver(self, selector: #selector(openSettings), name: NSNotification.Name("OpenSettings"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkForUpdates), name: NSNotification.Name("CheckForUpdates"), object: nil)
+
+        _ = updaterController
 
         recordingCoordinator = RecordingCoordinator()
         recordingCoordinator?.start()
@@ -54,7 +65,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 視窗標題根據介面語言顯示
         window.title = String(localized: "LaSay 設定")
         window.styleMask = [.titled, .closable]
-        window.setContentSize(NSSize(width: 500, height: 480))
+        window.setContentSize(NSSize(width: 520, height: 580))
         window.center()
         window.makeKeyAndOrderFront(nil)
 
@@ -127,7 +138,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
                 Text("• " + String(localized: "SenseVoice 離線辨識 + 雲端 OpenAI"))
                 Text("• " + String(localized: "AI 文字清理（保留技術術語）"))
-                Text("• " + String(localized: "全域快捷鍵：Fn + Space"))
+                Text("• " + String(format: String(localized: "全域快捷鍵：%@"), AppSettings.shared.hotkeyPreset.displayName))
                 Text("• " + String(localized: "任何 app 都能用，包括 Terminal 和 IDE"))
             }
             .font(.caption)
@@ -152,6 +163,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
 
         aboutWindow = window
+    }
+
+    @objc func checkForUpdates() {
+        updaterController.checkForUpdates(nil)
     }
 
     @objc func quitApp() {

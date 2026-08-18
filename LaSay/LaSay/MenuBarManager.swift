@@ -12,6 +12,8 @@ import QuartzCore
 final class MenuBarManager: NSObject {
     private let appState = AppState.shared
     private let onOpenSettings: () -> Void
+    private let onRunSetup: () -> Void
+    private let onCheckForUpdates: () -> Void
     private let onShowAbout: () -> Void
     private let onQuit: () -> Void
 
@@ -20,10 +22,14 @@ final class MenuBarManager: NSObject {
 
     init(
         onOpenSettings: @escaping () -> Void,
+        onRunSetup: @escaping () -> Void,
+        onCheckForUpdates: @escaping () -> Void,
         onShowAbout: @escaping () -> Void,
         onQuit: @escaping () -> Void
     ) {
         self.onOpenSettings = onOpenSettings
+        self.onRunSetup = onRunSetup
+        self.onCheckForUpdates = onCheckForUpdates
         self.onShowAbout = onShowAbout
         self.onQuit = onQuit
         super.init()
@@ -63,6 +69,14 @@ final class MenuBarManager: NSObject {
         let settingsItem = NSMenuItem(title: String(localized: "設定..."), action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
+
+        let setupItem = NSMenuItem(title: String(localized: "重新執行設定..."), action: #selector(runSetup), keyEquivalent: "")
+        setupItem.target = self
+        menu.addItem(setupItem)
+
+        let updateItem = NSMenuItem(title: String(localized: "檢查更新..."), action: #selector(checkForUpdates), keyEquivalent: "")
+        updateItem.target = self
+        menu.addItem(updateItem)
 
         let aboutItem = NSMenuItem(title: String(localized: "關於 LaSay"), action: #selector(showAbout), keyEquivalent: "")
         aboutItem.target = self
@@ -152,6 +166,14 @@ final class MenuBarManager: NSObject {
 
     @objc private func showAbout() {
         onShowAbout()
+    }
+
+    @objc private func runSetup() {
+        onRunSetup()
+    }
+
+    @objc private func checkForUpdates() {
+        onCheckForUpdates()
     }
 
     @objc private func quitApp() {

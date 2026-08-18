@@ -1,228 +1,165 @@
-//
-//  OnboardingView.swift
-//  LaSay
-//
-//  Created by Tamio Tsiu on 2026/2/15.
-//
-
-import SwiftUI
 import AppKit
+import SwiftUI
 
 struct OnboardingView: View {
     let onFinish: () -> Void
 
-    @State private var step: Int = 0
-    @State private var microphoneGranted: Bool = AudioRecorder.shared.checkMicrophonePermission()
-    @State private var accessibilityGranted: Bool = HotkeyManager.shared.checkAccessibilityPermission()
-    @State private var isPulsing: Bool = false
-    @State private var permissionTimer: Timer? = nil
-    @State private var showAccessibilityGuide: Bool = false
+    @State private var step = 0
+    @State private var microphoneGranted = AudioRecorder.shared.checkMicrophonePermission()
+    @State private var accessibilityGranted = HotkeyManager.shared.checkAccessibilityPermission()
+    @State private var permissionTimer: Timer?
+    @State private var testText = ""
+    @State private var launchAtLogin = false
+    @State private var didLoadLoginSetting = false
+    @FocusState private var testFieldFocused: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            if step == 0 {
-                permissionsStep
-            } else {
-                tryItStep
-            }
+        VStack(alignment: .leading, spacing: 24) {
+            if step == 0 { permissionsStep } else { testStep }
 
             Spacer()
 
             HStack {
-                if step > 0 {
-                    Button(String(localized: "返回")) {
-                        step -= 1
-                    }
-                    .accessibilityLabel(String(localized: "返回上一步"))
-                    .accessibilityHint("Go to previous step")
-                }
-
-                Spacer()
-
-                if step == 0 {
-                    Button(String(localized: "下一步")) {
-                        stopPermissionPolling()
-                        step += 1
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(!microphoneGranted || !accessibilityGranted)
-                    .accessibilityLabel(String(localized: "前往下一步"))
-                    .accessibilityHint("Continue to next step")
+                if step == 1 {
+                    Button(String(localized: "稍後完成"), action: finish)
+                    Spacer()
+                    Button(String(localized: "返回")) { step = 0 }
                 } else {
-                    Button(String(localized: "完成")) {
-                        onFinish()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .accessibilityLabel(String(localized: "完成設定"))
-                    .accessibilityHint("Complete onboarding")
+                    Spacer()
                 }
+
+                Button(step == 0 ? String(localized: "下一步") : String(localized: "開始使用 LaSay")) {
+                    if step == 0 {
+                        stopPermissionPolling()
+                        step = 1
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { testFieldFocused = true }
+                    } else {
+                        finish()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(step == 0 ? !permissionsGranted : testText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
         .padding(28)
-        .frame(width: 460, height: 420)
+        .frame(width: 480, height: 400)
         .onAppear {
-            applyDefaultModeIfNeeded()
+            AppSettings.shared.setDefaultTranscriptionModeIfNeeded()
+            guard !didLoadLoginSetting else { return }
+            launchAtLogin = AppSettings.shared.hasLaunchedBefore ? AppSettings.shared.launchAtLogin : true
+            didLoadLoginSetting = true
         }
     }
 
-    // MARK: - Permissions Step
+    private var permissionsGranted: Bool {
+        microphoneGranted && accessibilityGranted
+    }
 
     private var permissionsStep: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(String(localized: "權限設定"))
-                .font(.title)
-                .fontWeight(.bold)
+        VStack(alignment: .leading, spacing: 18) {
+            Label(String(localized: "兩個權限，約一分鐘"), systemImage: "lock.open")
+                .font(.title2.weight(.semibold))
 
-            Text(String(localized: "LaSay 需要麥克風與輔助使用權限才能正常工作。"))
-                .foregroundColor(.secondary)
+            Text(String(localized: "LaSay 只在你按住快捷鍵時錄音，並把辨識結果貼到目前的 App。"))
+                .foregroundStyle(.secondary)
 
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text(String(localized: "麥克風"))
-                        .font(.headline)
-                    Spacer()
-                    if microphoneGranted {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                    } else {
-                        Image(systemName: "circle")
-                            .foregroundColor(.secondary)
-                    }
-                }
-
-                if !microphoneGranted {
-                    Button(String(localized: "授予麥克風權限")) {
-                        AudioRecorder.shared.requestMicrophonePermission { granted in
-                            microphoneGranted = granted
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .accessibilityLabel(String(localized: "授予麥克風權限"))
-                    .accessibilityHint("Request microphone permission")
-                }
+            permissionRow(
+                title: String(localized: "麥克風"),
+                detail: String(localized: "用來錄下你說的話"),
+                granted: microphoneGranted,
+                actionTitle: String(localized: "允許")
+            ) {
+                AudioRecorder.shared.requestMicrophonePermission { microphoneGranted = $0 }
             }
 
             Divider()
 
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text(String(localized: "輔助使用"))
-                        .font(.headline)
-                    Spacer()
-                    if accessibilityGranted {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                    } else {
-                        Image(systemName: "circle")
-                            .foregroundColor(.secondary)
-                    }
-                }
-
-                if !accessibilityGranted {
-                    if showAccessibilityGuide {
-                        accessibilityGuide
-                            .transition(.opacity)
-                    } else {
-                        Button(String(localized: "授予輔助使用權限")) {
-                            HotkeyManager.shared.requestAccessibilityPermission()
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                showAccessibilityGuide = true
-                            }
-                        }
-                        .buttonStyle(.bordered)
-                        .accessibilityLabel(String(localized: "授予輔助使用權限"))
-                        .accessibilityHint("Request accessibility permission")
-                        .transition(.opacity)
-                    }
+            permissionRow(
+                title: String(localized: "輔助使用"),
+                detail: String(localized: "用來接收快捷鍵並貼上文字"),
+                granted: accessibilityGranted,
+                actionTitle: String(localized: "開啟系統設定")
+            ) {
+                HotkeyManager.shared.requestAccessibilityPermission()
+                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
+                    NSWorkspace.shared.open(url)
                 }
             }
+
+            Text(String(localized: "權限開啟後會自動繼續，不必重新啟動 App。"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
         .onAppear { startPermissionPolling() }
         .onDisappear { stopPermissionPolling() }
     }
 
-    // MARK: - Accessibility Guide
+    private func permissionRow(
+        title: String,
+        detail: String,
+        granted: Bool,
+        actionTitle: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: granted ? "checkmark.circle.fill" : "circle")
+                .foregroundStyle(granted ? Color.green : Color.secondary)
+                .font(.title2)
 
-    private var accessibilityGuide: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "在系統提示中完成以下步驟："))
-                .font(.subheadline)
-                .fontWeight(.medium)
-
-            VStack(alignment: .leading, spacing: 6) {
-                guideStep(number: 1, text: String(localized: "點擊「打開系統設定」"))
-                guideStep(number: 2, text: String(localized: "開啟「LaSay」旁邊的開關"))
-                guideStep(number: 3, text: String(localized: "如有提示，輸入密碼確認"))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.headline)
+                Text(detail).font(.caption).foregroundStyle(.secondary)
             }
 
-            HStack(alignment: .top, spacing: 4) {
-                Image(systemName: "questionmark.circle")
-                    .font(.caption2)
-                Text(String(localized: "若系統提示沒有出現，請使用下方按鈕。"))
+            Spacer()
+
+            if !granted {
+                Button(actionTitle, action: action)
+            }
+        }
+    }
+
+    private var testStep: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Label(String(localized: "說一句話，就設定完成"), systemImage: "waveform")
+                .font(.title2.weight(.semibold))
+
+            Text(String(format: String(localized: "點一下文字框，按住 %@ 說話，放開後 LaSay 會把結果貼進來。"), AppSettings.shared.hotkeyPreset.displayName))
+                .foregroundStyle(.secondary)
+
+            TextEditor(text: $testText)
+                .focused($testFieldFocused)
+                .font(.body)
+                .padding(8)
+                .frame(height: 130)
+                .background(Color(nsColor: .textBackgroundColor))
+                .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.secondary.opacity(0.35)))
+
+            if testText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Text(String(localized: "提示：短按不會錄音，請按住、說話、再放開。"))
                     .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Label(String(localized: "成功！LaSay 已經可以在任何 App 使用。"), systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
             }
-            .foregroundColor(.secondary)
-            .padding(.top, 2)
 
-            HStack(spacing: 4) {
-                Image(systemName: "arrow.triangle.2.circlepath")
-                    .font(.caption2)
-                Text(String(localized: "完成後會自動偵測"))
-                    .font(.caption)
-            }
-            .foregroundColor(.secondary)
-
-            Button(String(localized: "直接打開系統設定")) {
-                openAccessibilitySettings()
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-        }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color(nsColor: .controlBackgroundColor))
-        )
-    }
-
-    private func guideStep(number: Int, text: String) -> some View {
-        HStack(spacing: 8) {
-            Text("\(number)")
-                .font(.caption)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-                .frame(width: 18, height: 18)
-                .background(Circle().fill(Color.accentColor))
-
-            Text(text)
-                .font(.subheadline)
-        }
-        .accessibilityElement(children: .combine)
-    }
-
-    private func openAccessibilitySettings() {
-        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-            NSWorkspace.shared.open(url)
+            Toggle(String(localized: "登入後自動啟動（推薦）"), isOn: $launchAtLogin)
         }
     }
 
-    // MARK: - Permission Polling
+    private func finish() {
+        AppSettings.shared.launchAtLogin = launchAtLogin
+        onFinish()
+    }
 
     private func startPermissionPolling() {
-        permissionTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-            DispatchQueue.main.async {
-                let newMic = AudioRecorder.shared.checkMicrophonePermission()
-                let newAccessibility = HotkeyManager.shared.checkAccessibilityPermission()
-
-                let accessibilityWasGranted = accessibilityGranted
-
-                microphoneGranted = newMic
-                accessibilityGranted = newAccessibility
-
-                if newAccessibility && !accessibilityWasGranted {
-                    HotkeyManager.shared.startMonitoring()
-                }
-            }
+        permissionTimer?.invalidate()
+        permissionTimer = Timer.scheduledTimer(withTimeInterval: 0.8, repeats: true) { _ in
+            let wasTrusted = accessibilityGranted
+            microphoneGranted = AudioRecorder.shared.checkMicrophonePermission()
+            accessibilityGranted = HotkeyManager.shared.checkAccessibilityPermission()
+            if accessibilityGranted && !wasTrusted { HotkeyManager.shared.startMonitoring() }
         }
     }
 
@@ -230,43 +167,6 @@ struct OnboardingView: View {
         permissionTimer?.invalidate()
         permissionTimer = nil
     }
-
-    // MARK: - Try It Step
-
-    private var tryItStep: some View {
-        VStack(spacing: 16) {
-            Spacer()
-            
-            Image(systemName: "mic.circle.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.blue)
-                .opacity(isPulsing ? 0.5 : 1.0)
-                .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isPulsing)
-                .onAppear { isPulsing = true }
-            
-            Text(String(localized: "試試看"))
-                .font(.title)
-                .fontWeight(.bold)
-
-            Text(String(localized: "按住 Fn + Space 試試看！"))
-                .font(.headline)
-
-            Text(String(localized: "完成後就可以開始使用 LaSay。"))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    // MARK: - Defaults
-
-    private func applyDefaultModeIfNeeded() {
-        AppSettings.shared.setDefaultTranscriptionModeIfNeeded()
-    }
 }
 
-#Preview {
-    OnboardingView(onFinish: {})
-}
+#Preview { OnboardingView(onFinish: {}) }

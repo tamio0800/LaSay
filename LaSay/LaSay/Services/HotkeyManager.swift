@@ -9,6 +9,32 @@ import Cocoa
 import ApplicationServices
 import os.log
 
+enum HotkeyPreset: String, CaseIterable, Identifiable {
+    case fnSpace = "fn_space"
+    case controlSpace = "control_space"
+    case optionSpace = "option_space"
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .fnSpace: return "Fn + Space"
+        case .controlSpace: return "Control + Space"
+        case .optionSpace: return "Option + Space"
+        }
+    }
+
+    var keyCode: CGKeyCode { 49 }
+
+    var requiredFlags: CGEventFlags {
+        switch self {
+        case .fnSpace: return .maskSecondaryFn
+        case .controlSpace: return .maskControl
+        case .optionSpace: return .maskAlternate
+        }
+    }
+}
+
 class HotkeyManager {
     static let shared = HotkeyManager()
 
@@ -23,17 +49,39 @@ class HotkeyManager {
         set { stateQueue.sync { _isHotkeyPressed = newValue } }
     }
 
+    private var _hotkeyPreset: HotkeyPreset
+    private var hotkeyPresetObserver: NSObjectProtocol?
+    private var hotkeyPreset: HotkeyPreset {
+        get { stateQueue.sync { _hotkeyPreset } }
+        set { stateQueue.sync { _hotkeyPreset = newValue } }
+    }
+
     // 回調
     var onHotkeyPressed: (() -> Void)?
     var onHotkeyReleased: (() -> Void)?
 
-    // 預設快捷鍵：Fn + Space
-    private var keyCode: CGKeyCode = 49  // Space 鍵
-
-    private init() {}
+    private init() {
+        _hotkeyPreset = HotkeyPreset(rawValue: UserDefaults.standard.string(forKey: "hotkey_preset") ?? "") ?? .fnSpace
+        hotkeyPresetObserver = NotificationCenter.default.addObserver(
+            forName: .hotkeyPresetDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let preset = notification.object as? HotkeyPreset else { return }
+            self?.applyHotkeyPreset(preset)
+        }
+    }
     
     deinit {
+        if let hotkeyPresetObserver {
+            NotificationCenter.default.removeObserver(hotkeyPresetObserver)
+        }
         stopMonitoring()
+    }
+
+    var selectedHotkeyPreset: HotkeyPreset {
+        get { hotkeyPreset }
+        set { AppSettings.shared.hotkeyPreset = newValue }
     }
 
     // MARK: - Accessibility Permission
@@ -50,6 +98,14 @@ class HotkeyManager {
     }
 
     // MARK: - Hotkey Management
+
+    private func applyHotkeyPreset(_ preset: HotkeyPreset) {
+        guard hotkeyPreset != preset else { return }
+        hotkeyPreset = preset
+        if eventTap != nil {
+            restartMonitoring()
+        }
+    }
 
     /// 啟動全域快捷鍵監聽
     func startMonitoring() {
@@ -74,7 +130,7 @@ class HotkeyManager {
             options: .defaultTap,
             eventsOfInterest: CGEventMask(eventMask),
             callback: { (proxy, type, event, refcon) -> Unmanaged<CGEvent>? in
-                guard let refcon = refcon else { return Unmanaged.passRetained(event) }
+                guard let refcon = refcon else { return Unmanaged.passUnretained(event) }
                 let manager = Unmanaged<HotkeyManager>.fromOpaque(refcon).takeUnretainedValue()
                 return manager.handleEvent(proxy: proxy, type: type, event: event)
             },
@@ -119,20 +175,25 @@ class HotkeyManager {
     // MARK: - Event Handling
 
     private func handleEvent(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
+        if type == .tapDisabledByTimeout {
+            if let eventTap { CGEvent.tapEnable(tap: eventTap, enable: true) }
+            return Unmanaged.passUnretained(event)
+        }
+
         // 處理 flags changed（修飾鍵變化）
         if type == .flagsChanged {
-            return Unmanaged.passRetained(event)
+            return Unmanaged.passUnretained(event)
         }
 
         // 獲取按鍵資訊
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
         let flags = event.flags
 
-        // 檢查是否是 Space 鍵
-        let isTargetKey = keyCode == Int64(self.keyCode)
+        let preset = hotkeyPreset
+        let isTargetKey = keyCode == Int64(preset.keyCode)
 
-        // 檢查是否按住 Fn 鍵
-        let hasModifiers = flags.contains(.maskSecondaryFn)
+        let relevantFlags: CGEventFlags = [.maskCommand, .maskControl, .maskAlternate, .maskShift, .maskSecondaryFn]
+        let hasModifiers = flags.intersection(relevantFlags) == preset.requiredFlags
 
         // 優先處理 keyUp：只要是 Space 鍵且之前按下過，就觸發放開（不管 Fn 鍵是否還按著）
         if type == .keyUp && isTargetKey && isHotkeyPressed {
@@ -161,7 +222,7 @@ class HotkeyManager {
         }
 
         // 不是我們的快捷鍵，讓事件繼續傳遞
-        return Unmanaged.passRetained(event)
+        return Unmanaged.passUnretained(event)
     }
 
 }

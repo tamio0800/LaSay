@@ -8,7 +8,8 @@ final class AppSettingsTests: XCTestCase {
         "cloud_transcription_model",
         "custom_cloud_transcription_model_id",
         "ai_polish_model",
-        "custom_ai_polish_model_id"
+        "custom_ai_polish_model_id",
+        "hotkey_preset"
     ]
 
     override func setUp() {
@@ -61,5 +62,15 @@ final class AppSettingsTests: XCTestCase {
 
         XCTAssertEqual(AppSettings.shared.aiPolishModel, .custom)
         XCTAssertEqual(AppSettings.aiPolishModelID(), "my-polisher")
+    }
+
+    func testHotkeyPresetDefaultsToFnSpace() {
+        XCTAssertEqual(AppSettings.shared.hotkeyPreset, .fnSpace)
+    }
+
+    func testHotkeyPresetPersistsSelection() {
+        AppSettings.shared.hotkeyPreset = .optionSpace
+
+        XCTAssertEqual(AppSettings.shared.hotkeyPreset, .optionSpace)
     }
 }

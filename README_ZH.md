@@ -1,5 +1,7 @@
 # LaSay
 
+Homebrew 安裝：`brew install --cask tamio0800/tap/lasay`
+
 給開發者的語音輸入工具。用母語口述，夾雜英文技術術語 -- LaSay 原封不動保留。
 
 [English](README.md)
@@ -16,25 +18,25 @@
 
 任何 app 都能用 -- VS Code、Terminal、Slack、瀏覽器，任何有輸入框的地方。
 
+首次啟動時，依提示授予麥克風與輔助使用權限。預設按住 Fn+Space 口述；從選單列圖示開啟設定，簽章版本可自動檢查更新。
+
 ## 功能
 
 - **混語言轉錄** -- 母語 + 英文技術術語混著說
 - **300+ 術語保留** -- React、FastAPI、Kubernetes、camelCase 識別字全部保留
 - **雙轉錄模式** -- 雲端（OpenAI，可選模型）或本地（SenseVoice，完全離線）
 - **AI 文字清理** -- 去贅字、修文法、保留術語，可選擇 OpenAI 模型
-- **全域快捷鍵** -- Fn+Space 在任何 app 都能用
+- **可調整按住說話快捷鍵** -- 預設 Fn+Space，也可選 Control+Space 或 Option+Space
 - **即時貼上** -- 轉錄完成的瞬間，文字出現在游標位置
 - **安全儲存** -- API Key 存在 macOS Keychain
 
 ## 快速開始
 
-> 目前尚未提供公開簽章下載；請先依照下方說明從原始碼建置。
-
 ```
-1. 安裝 LaSay.app 到 /Applications
-2. 首次啟動授予麥克風 + 輔助使用權限
-3. Menu bar → 設定 → 輸入 OpenAI API Key
-4. 在任何地方按住 Fn+Space 開始口述
+1. brew install --cask tamio0800/tap/lasay
+2. 開啟 LaSay，授予麥克風 + 輔助使用權限
+3. 在任何地方按住 Fn+Space 開始口述
+4. 選用：從選單列圖示設定 OpenAI 或更改快捷鍵
 ```
 
 不用註冊。不用登入。不用雲端同步。你的 API Key，你的資料。

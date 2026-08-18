@@ -1,454 +1,334 @@
-//
-//  SettingsView.swift
-//  LaSay
-//
-//  Created by Tamio Tsiu on 2026/1/25.
-//
-
+import AppKit
 import SwiftUI
 
 struct SettingsView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\.dismiss) private var dismiss
 
-    @State private var apiKey: String = ""
-    @State private var hasAPIKey: Bool = false
-    @State private var showingAPIKeyInput: Bool = false
-    @State private var enableAIPolish: Bool = false
-    @State private var customSystemPrompt: String = ""
-    @State private var transcriptionMode: TranscriptionMode = .cloud
+    @State private var transcriptionMode: TranscriptionMode = .senseVoice
     @State private var transcriptionLanguage: TranscriptionLanguage = .auto
-    @State private var cloudTranscriptionModel: CloudTranscriptionModel = .automatic
-    @State private var customCloudTranscriptionModelID: String = ""
+    @State private var hotkeyPreset: HotkeyPreset = .fnSpace
+    @State private var launchAtLogin = false
+    @State private var loginNeedsAttention = false
+    @State private var enableAIPolish = false
     @State private var punctuationStyle: PunctuationStyle = .fullWidth
+    @State private var restoreClipboard = true
+    @State private var cloudTranscriptionModel: CloudTranscriptionModel = .automatic
+    @State private var customCloudTranscriptionModelID = ""
     @State private var aiPolishModel: AIPolishModel = .automatic
-    @State private var customAIPolishModelID: String = ""
-    @State private var showAPIKey: Bool = false
-    @State private var isAIPolishAdvancedExpanded: Bool = false
-    @State private var showDeleteAPIKeyConfirm: Bool = false
-    @State private var isLoadingModel: Bool = false
+    @State private var customAIPolishModelID = ""
+    @State private var customSystemPrompt = ""
+    @State private var isAdvancedExpanded = false
+    @State private var isLoadingModel = false
+    @State private var apiKey = ""
+    @State private var hasAPIKey = false
+    @State private var editingAPIKey = false
+    @State private var showAPIKey = false
+    @State private var showDeleteAPIKeyConfirm = false
 
-    private var isUsingCustomPrompt: Bool {
+    private let keychain = KeychainHelper.shared
+    private let senseVoice = SenseVoiceService.shared
+
+    private var needsAPIKey: Bool { transcriptionMode == .cloud || enableAIPolish }
+    private var hasCustomPrompt: Bool {
         !customSystemPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    private let keychainHelper = KeychainHelper.shared
-    private let openAIService = OpenAIService.shared
-    private let senseVoiceService = SenseVoiceService.shared
     var body: some View {
         VStack(spacing: 16) {
-            Text(String(localized: "設定"))
-                .font(.title)
-                .fontWeight(.bold)
+            HStack(spacing: 10) {
+                Image(systemName: "waveform")
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("LaSay").font(.title2.weight(.semibold))
+                    Text(String(format: String(localized: "按住 %@ 說話，放開後自動輸入"), hotkeyPreset.displayName))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
 
             Divider()
 
-            ScrollViewReader { proxy in
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        // MARK: - 轉錄模式
-                        transcriptionSection
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    generalSection
 
+                    Divider()
+
+                    polishSection
+
+                    if needsAPIKey {
                         Divider()
-
-                        // MARK: - 標點符號 (local 模式才顯示)
-                        if transcriptionMode == .senseVoice {
-                            punctuationSection
-
-                            Divider()
-                        }
-
-                        // MARK: - AI 潤飾
-                        aiPolishSection
-
-                        Divider()
-
-                        // MARK: - API Key
                         apiKeySection
-                            .id("apiKeySection")
                     }
-                    .padding(.horizontal, 4)
-                }
-                .onAppear {
-                    loadSettings()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        if !hasAPIKey && transcriptionMode == .cloud {
-                            withAnimation {
-                                proxy.scrollTo("apiKeySection", anchor: .top)
-                            }
-                        }
+
+                    Divider()
+
+                    DisclosureGroup(String(localized: "進階設定"), isExpanded: $isAdvancedExpanded) {
+                        advancedSection.padding(.top, 12)
                     }
                 }
+                .padding(.horizontal, 2)
             }
 
-            Spacer()
+            Divider()
 
             HStack {
-                Text(String(localized: "自動儲存（API Key 除外）"))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
-                Spacer()
-
-                Button(String(localized: "關閉")) {
-                    dismiss()
+                Button(String(localized: "檢查更新...")) {
+                    NotificationCenter.default.post(name: NSNotification.Name("CheckForUpdates"), object: nil)
                 }
-                .keyboardShortcut(.cancelAction)
-                .accessibilityLabel(String(localized: "關閉設定視窗"))
+                Spacer()
+                Button(String(localized: "關閉")) { dismiss() }
+                    .keyboardShortcut(.cancelAction)
             }
         }
         .padding(24)
-        .frame(minWidth: 500, idealWidth: 500, maxWidth: 500, minHeight: 400, maxHeight: 600)
+        .frame(width: 520, height: 580)
+        .onAppear(perform: loadSettings)
     }
 
-    // MARK: - Transcription Section
-
-    private var transcriptionSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "語音轉錄"))
-                .font(.headline)
+    private var generalSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(String(localized: "一般")).font(.headline)
 
             HStack {
-                Text(String(localized: "轉錄模式"))
+                Text(String(localized: "辨識方式"))
                 Spacer()
                 Picker("", selection: $transcriptionMode) {
-                    ForEach(TranscriptionMode.allCases, id: \.self) { mode in
-                        Text(mode.localizedDisplayName).tag(mode)
-                    }
+                    ForEach(TranscriptionMode.allCases, id: \.self) { Text($0.localizedDisplayName).tag($0) }
                 }
-                .pickerStyle(.menu)
-                .onChange(of: transcriptionMode) { newValue in
-                    AppSettings.shared.transcriptionMode = newValue
-                    if newValue == .senseVoice, !senseVoiceService.isModelLoaded {
+                .labelsHidden()
+                .frame(width: 250)
+                .onChange(of: transcriptionMode) { mode in
+                    AppSettings.shared.transcriptionMode = mode
+                    if mode == .senseVoice, !senseVoice.isModelLoaded {
                         isLoadingModel = true
-                        senseVoiceService.preloadModel(completion: { _ in isLoadingModel = false })
+                        senseVoice.preloadModel { _ in isLoadingModel = false }
                     }
                 }
             }
 
             HStack {
-                Text(String(localized: "轉錄語言"))
+                Text(String(localized: "語言"))
                 Spacer()
                 Picker("", selection: $transcriptionLanguage) {
-                    ForEach(TranscriptionLanguage.allCases, id: \.self) { language in
-                        Text(language.displayName).tag(language)
-                    }
+                    ForEach(TranscriptionLanguage.allCases, id: \.self) { Text($0.displayName).tag($0) }
                 }
-                .pickerStyle(.menu)
-                .onChange(of: transcriptionLanguage) { newValue in
-                    AppSettings.shared.transcriptionLanguage = newValue
-                }
+                .labelsHidden()
+                .frame(width: 250)
+                .onChange(of: transcriptionLanguage) { AppSettings.shared.transcriptionLanguage = $0 }
             }
 
-            Text(String(localized: "SenseVoice 離線辨識，雲端使用 OpenAI API"))
+            HStack {
+                Text(String(localized: "按住說話快捷鍵"))
+                Spacer()
+                Picker("", selection: $hotkeyPreset) {
+                    ForEach(HotkeyPreset.allCases) { Text($0.displayName).tag($0) }
+                }
+                .labelsHidden()
+                .frame(width: 250)
+                .onChange(of: hotkeyPreset) { AppSettings.shared.hotkeyPreset = $0 }
+            }
+
+            Toggle(String(localized: "登入後自動啟動 LaSay"), isOn: $launchAtLogin)
+                .onChange(of: launchAtLogin) { requested in
+                    AppSettings.shared.launchAtLogin = requested
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        let actual = AppSettings.shared.launchAtLogin
+                        loginNeedsAttention = actual != requested
+                        launchAtLogin = actual
+                    }
+                }
+
+            if loginNeedsAttention {
+                Button(String(localized: "在系統設定確認登入項目")) {
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }
                 .font(.caption)
-                .foregroundColor(.secondary)
+            }
+
+            if isLoadingModel {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.small)
+                    Text(String(localized: "模型載入中...")).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private var polishSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Toggle(String(localized: "自動整理口語文字"), isOn: $enableAIPolish)
+                .font(.headline)
+                .onChange(of: enableAIPolish) { AppSettings.shared.enableAIPolish = $0 }
+            Text(String(localized: "移除贅字、修正文法並保留技術術語（使用 OpenAI）"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var advancedSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            if transcriptionMode == .senseVoice {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(String(localized: "標點符號")).font(.subheadline.weight(.medium))
+                    Picker("", selection: $punctuationStyle) {
+                        ForEach(PunctuationStyle.allCases, id: \.self) { Text($0.localizedDisplayName).tag($0) }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.segmented)
+                    .onChange(of: punctuationStyle) { AppSettings.shared.punctuationStyle = $0 }
+                }
+            }
 
             if transcriptionMode == .cloud {
-                HStack {
-                    Text(String(localized: "轉錄模型"))
-                    Spacer()
-                    Picker("", selection: $cloudTranscriptionModel) {
-                        ForEach(CloudTranscriptionModel.allCases, id: \.self) { model in
-                            Text(model.localizedDisplayName).tag(model)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .onChange(of: cloudTranscriptionModel) { model in
-                        AppSettings.shared.cloudTranscriptionModel = model
-                    }
-                }
-
-                Text(cloudTranscriptionModel.localizedDescription)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-
-                if cloudTranscriptionModel == .custom {
-                    TextField(String(localized: "輸入轉錄模型 ID"), text: $customCloudTranscriptionModelID)
-                        .textFieldStyle(.roundedBorder)
-                        .onChange(of: customCloudTranscriptionModelID) { newValue in
-                            AppSettings.shared.customCloudTranscriptionModelID = newValue
-                        }
-                }
+                modelPicker(
+                    title: String(localized: "轉錄模型"),
+                    selection: $cloudTranscriptionModel,
+                    customID: $customCloudTranscriptionModelID
+                )
             }
-
-            if transcriptionMode == .senseVoice && isLoadingModel {
-                HStack(spacing: 6) {
-                    ProgressView()
-                        .controlSize(.small)
-                    Text(String(localized: "模型載入中..."))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-    }
-
-    // MARK: - Punctuation Section
-
-    private var punctuationSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "標點符號"))
-                .font(.headline)
-
-            Picker("", selection: $punctuationStyle) {
-                ForEach(PunctuationStyle.allCases, id: \.self) { style in
-                    Text(style.localizedDisplayName).tag(style)
-                }
-            }
-            .pickerStyle(.segmented)
-            .onChange(of: punctuationStyle) { newValue in
-                AppSettings.shared.punctuationStyle = newValue
-            }
-
-            Text(punctuationExample)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-    }
-
-    private var punctuationExample: String {
-        switch punctuationStyle {
-        case .fullWidth: return String(localized: "範例：Hello，World。This is a test！")
-        case .halfWidth: return String(localized: "範例：Hello,World.This is a test!")
-        case .spaces: return String(localized: "範例：Hello World This is a test")
-        }
-    }
-
-    // MARK: - AI Polish Section
-
-    private var aiPolishSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "AI 文字潤飾"))
-                .font(.headline)
-
-            Toggle(String(localized: "啟用 AI 潤飾"), isOn: $enableAIPolish)
-                .toggleStyle(.checkbox)
-                .accessibilityLabel(String(localized: "AI 潤飾開關"))
-                .accessibilityHint(String(localized: "點擊以切換"))
-                .accessibilityValue(enableAIPolish ? String(localized: "已開啟") : String(localized: "已關閉"))
-                .onChange(of: enableAIPolish) { newValue in
-                    AppSettings.shared.enableAIPolish = newValue
-                }
-
-            Text(String(localized: "移除口語贅字、修正文法、優化句子結構"))
-                .font(.caption)
-                .foregroundColor(.secondary)
 
             if enableAIPolish {
-                Text(String(localized: "AI 清理：移除贅字、修正文法、保留技術術語"))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                polishModelPicker
 
-                HStack {
-                    Text(String(localized: "潤飾模型"))
-                    Spacer()
-                    Picker("", selection: $aiPolishModel) {
-                        ForEach(AIPolishModel.allCases, id: \.self) { model in
-                            Text(model.localizedDisplayName).tag(model)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .onChange(of: aiPolishModel) { model in
-                        AppSettings.shared.aiPolishModel = model
-                    }
-                }
-
-                Text(aiPolishModel.localizedDescription)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-
-                if aiPolishModel == .custom {
-                    TextField(String(localized: "輸入文字模型 ID"), text: $customAIPolishModelID)
-                        .textFieldStyle(.roundedBorder)
-                        .onChange(of: customAIPolishModelID) { newValue in
-                            AppSettings.shared.customAIPolishModelID = newValue
-                        }
-                }
-
-                DisclosureGroup(String(localized: "進階設定"), isExpanded: $isAIPolishAdvancedExpanded) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(String(format: String(localized: "目前使用：%@"), isUsingCustomPrompt ? String(localized: "自訂") : String(localized: "預設")))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        Text(String(localized: "你可以在這裡自訂 AI 潤飾的指令"))
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
                         Text(String(localized: "自訂 System Prompt（選填）"))
-                            .font(.subheadline)
-
-                        ZStack(alignment: .topLeading) {
-                            if !isUsingCustomPrompt {
-                                Text(openAIService.getDefaultPromptSummary())
-                                    .foregroundColor(.secondary)
-                                    .font(.system(.body, design: .monospaced))
-                                    .padding(.top, 8)
-                                    .padding(.horizontal, 6)
-                            }
-
-                            TextEditor(text: $customSystemPrompt)
-                                .frame(minHeight: 120, maxHeight: 180)
-                                .font(.system(.body, design: .monospaced))
-                                .border(Color.secondary.opacity(0.3))
-                                .onChange(of: customSystemPrompt) { newValue in
-                                    AppSettings.shared.customSystemPrompt = newValue
-                                }
-                        }
-
-                        HStack {
-                            Button(String(localized: "重設為預設")) {
-                                customSystemPrompt = ""
-                            }
-                            .font(.caption)
-
-                            Spacer()
+                        Spacer()
+                        if hasCustomPrompt {
+                            Button(String(localized: "重設為預設")) { customSystemPrompt = "" }
+                                .font(.caption)
                         }
                     }
-                    .padding(.top, 4)
+                    TextEditor(text: $customSystemPrompt)
+                        .font(.system(.body, design: .monospaced))
+                        .frame(height: 100)
+                        .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color.secondary.opacity(0.3)))
+                        .onChange(of: customSystemPrompt) { AppSettings.shared.customSystemPrompt = $0 }
                 }
+            }
+
+            Toggle(String(localized: "輸入後還原原本的剪貼簿"), isOn: $restoreClipboard)
+                .onChange(of: restoreClipboard) { AppSettings.shared.restoreClipboard = $0 }
+
+            if !needsAPIKey { apiKeySection }
+        }
+    }
+
+    private func modelPicker(
+        title: String,
+        selection: Binding<CloudTranscriptionModel>,
+        customID: Binding<String>
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(title)
+                Spacer()
+                Picker("", selection: selection) {
+                    ForEach(CloudTranscriptionModel.allCases, id: \.self) { Text($0.localizedDisplayName).tag($0) }
+                }
+                .labelsHidden()
+                .onChange(of: selection.wrappedValue) { AppSettings.shared.cloudTranscriptionModel = $0 }
+            }
+            Text(selection.wrappedValue.localizedDescription).font(.caption).foregroundStyle(.secondary)
+            if selection.wrappedValue == .custom {
+                TextField(String(localized: "輸入轉錄模型 ID"), text: customID)
+                    .onChange(of: customID.wrappedValue) { AppSettings.shared.customCloudTranscriptionModelID = $0 }
             }
         }
     }
 
-    // MARK: - API Key Section
+    private var polishModelPicker: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(String(localized: "潤飾模型"))
+                Spacer()
+                Picker("", selection: $aiPolishModel) {
+                    ForEach(AIPolishModel.allCases, id: \.self) { Text($0.localizedDisplayName).tag($0) }
+                }
+                .labelsHidden()
+                .onChange(of: aiPolishModel) { AppSettings.shared.aiPolishModel = $0 }
+            }
+            Text(aiPolishModel.localizedDescription).font(.caption).foregroundStyle(.secondary)
+            if aiPolishModel == .custom {
+                TextField(String(localized: "輸入文字模型 ID"), text: $customAIPolishModelID)
+                    .onChange(of: customAIPolishModelID) { AppSettings.shared.customAIPolishModelID = $0 }
+            }
+        }
+    }
 
     private var apiKeySection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "OpenAI API Key"))
-                .font(.headline)
+            Text(String(localized: "OpenAI API Key")).font(.headline)
 
-            if hasAPIKey && !showingAPIKeyInput {
+            if hasAPIKey && !editingAPIKey {
                 HStack {
-                    Text(String(localized: "已設定 API Key"))
-                        .foregroundColor(.green)
-
-                    if showAPIKey {
-                        Text(apiKey)
-                            .font(.system(.body, design: .monospaced))
-                            .textSelection(.enabled)
-                    } else {
-                        Text("(\(apiKey.prefix(7))...\(apiKey.suffix(4)))")
-                            .font(.system(.body, design: .monospaced))
-                    }
-
+                    Label(String(localized: "已設定 API Key"), systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
                     Spacer()
-
-                    Button(showAPIKey ? String(localized: "隱藏") : String(localized: "顯示")) {
-                        showAPIKey.toggle()
-                    }
-                    .font(.caption)
-                    .accessibilityLabel(String(localized: "顯示或隱藏 API Key"))
-
-                    Button(String(localized: "更新")) {
-                        showingAPIKeyInput = true
-                    }
-                    .font(.caption)
-
-                    Button(String(localized: "刪除")) {
-                        showDeleteAPIKeyConfirm = true
-                    }
-                    .font(.caption)
-                    .foregroundColor(.red)
-                    .accessibilityLabel(String(localized: "刪除 API Key"))
+                    Button(String(localized: "更新")) { editingAPIKey = true }
+                    Button(String(localized: "刪除"), role: .destructive) { showDeleteAPIKeyConfirm = true }
                 }
-                .frame(maxWidth: 420)
             } else {
                 HStack {
-                    if showAPIKey {
-                        TextField(String(localized: "請輸入 API Key (sk-...)"), text: $apiKey)
-                            .textFieldStyle(.roundedBorder)
-                    } else {
-                        SecureField(String(localized: "請輸入 API Key (sk-...)"), text: $apiKey)
-                            .textFieldStyle(.roundedBorder)
-                    }
-
-                    Button(showAPIKey ? String(localized: "隱藏") : String(localized: "顯示")) {
-                        showAPIKey.toggle()
-                    }
-                    .font(.caption)
-                    .accessibilityLabel(String(localized: "顯示或隱藏 API Key"))
-
-                    Button(String(localized: "儲存")) {
-                        if !apiKey.isEmpty {
-                            let success = keychainHelper.save(key: "openai_api_key", value: apiKey)
-                            if success {
-                                hasAPIKey = true
-                                showingAPIKeyInput = false
-                            }
+                    Group {
+                        if showAPIKey {
+                            TextField(String(localized: "請輸入 API Key (sk-...)"), text: $apiKey)
+                        } else {
+                            SecureField(String(localized: "請輸入 API Key (sk-...)"), text: $apiKey)
                         }
                     }
-                    .font(.caption)
-                    .buttonStyle(.borderedProminent)
-                    .accessibilityLabel(String(localized: "儲存 API Key"))
-
-                    if hasAPIKey {
-                        Button(String(localized: "取消")) {
-                            showingAPIKeyInput = false
-                            loadAPIKey()
-                        }
-                        .font(.caption)
-                        .accessibilityLabel(String(localized: "取消"))
-                    }
+                    Button(showAPIKey ? String(localized: "隱藏") : String(localized: "顯示")) { showAPIKey.toggle() }
+                    Button(String(localized: "儲存")) { saveAPIKey() }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
-                .frame(maxWidth: 420)
             }
-
-            Text(String(localized: "用於雲端語音轉錄與 AI 文字潤飾"))
-                .font(.caption)
-                .foregroundColor(.secondary)
 
             Link(String(localized: "取得 API Key → platform.openai.com"), destination: URL(string: "https://platform.openai.com/api-keys")!)
                 .font(.caption)
         }
-        .alert(
-            String(localized: "確定刪除 API Key？"),
-            isPresented: $showDeleteAPIKeyConfirm
-        ) {
+        .alert(String(localized: "確定刪除 API Key？"), isPresented: $showDeleteAPIKeyConfirm) {
             Button(String(localized: "刪除"), role: .destructive) {
-                _ = keychainHelper.delete(key: "openai_api_key")
+                _ = keychain.delete(key: "openai_api_key")
                 apiKey = ""
                 hasAPIKey = false
-                showingAPIKeyInput = true
-                showAPIKey = false
+                editingAPIKey = true
             }
             Button(String(localized: "取消"), role: .cancel) {}
-        } message: {
-            Text(String(localized: "刪除後，雲端模式和 AI 潤飾將無法使用，直到重新輸入 API Key。"))
         }
     }
 
-    // MARK: - Methods
-
-    func loadSettings() {
-        loadAPIKey()
-
+    private func loadSettings() {
         transcriptionMode = AppSettings.shared.transcriptionMode
         transcriptionLanguage = AppSettings.shared.transcriptionLanguage
+        hotkeyPreset = AppSettings.shared.hotkeyPreset
+        launchAtLogin = AppSettings.shared.launchAtLogin
+        enableAIPolish = AppSettings.shared.enableAIPolish
+        punctuationStyle = AppSettings.shared.punctuationStyle
+        restoreClipboard = AppSettings.shared.restoreClipboard
         cloudTranscriptionModel = AppSettings.shared.cloudTranscriptionModel
         customCloudTranscriptionModelID = AppSettings.shared.customCloudTranscriptionModelID ?? ""
-        punctuationStyle = AppSettings.shared.punctuationStyle
-        enableAIPolish = AppSettings.shared.enableAIPolish
         aiPolishModel = AppSettings.shared.aiPolishModel
         customAIPolishModelID = AppSettings.shared.customAIPolishModelID ?? ""
         customSystemPrompt = AppSettings.shared.customSystemPrompt ?? ""
+        apiKey = keychain.get(key: "openai_api_key") ?? ""
+        hasAPIKey = !apiKey.isEmpty
+        editingAPIKey = !hasAPIKey
     }
 
-    func loadAPIKey() {
-        if let savedAPIKey = keychainHelper.get(key: "openai_api_key"), !savedAPIKey.isEmpty {
-            apiKey = savedAPIKey
-            hasAPIKey = true
-            showingAPIKeyInput = false
-        } else {
-            apiKey = ""
-            hasAPIKey = false
-            showingAPIKeyInput = true
-        }
+    private func saveAPIKey() {
+        let trimmed = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, keychain.save(key: "openai_api_key", value: trimmed) else { return }
+        apiKey = trimmed
+        hasAPIKey = true
+        editingAPIKey = false
+        showAPIKey = false
     }
 }
 
-#Preview {
-    SettingsView()
-}
+#Preview { SettingsView() }

@@ -85,7 +85,10 @@ final class RecordingCoordinator {
         if duration < 0.5 {
             AppLogger.recording.info("Recording too short: \(duration, privacy: .public)s, deleting")
             try? FileManager.default.removeItem(at: audioURL)
-            showNotification(title: String(localized: "錄音太短"), body: String(localized: "請按住 Fn+Space 說話，放開後自動辨識"))
+            showNotification(
+                title: String(localized: "錄音太短"),
+                body: String(format: String(localized: "請按住 %@ 說話，放開後自動辨識"), AppSettings.shared.hotkeyPreset.displayName)
+            )
             appState.updateStatus(.idle)
             hotkeyManager.restartMonitoring()
             return

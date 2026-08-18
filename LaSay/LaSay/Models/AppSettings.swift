@@ -6,6 +6,12 @@
 //
 
 import Foundation
+import ServiceManagement
+import os.log
+
+extension Notification.Name {
+    static let hotkeyPresetDidChange = Notification.Name("HotkeyPresetDidChange")
+}
 
 /// Centralized UserDefaults wrapper for app-wide settings.
 /// All UserDefaults access should go through this singleton.
@@ -19,6 +25,7 @@ final class AppSettings {
     nonisolated private static let customCloudTranscriptionModelIDKey = "custom_cloud_transcription_model_id"
     nonisolated private static let aiPolishModelKey = "ai_polish_model"
     nonisolated private static let customAIPolishModelIDKey = "custom_ai_polish_model_id"
+    nonisolated private static let hotkeyPresetKey = "hotkey_preset"
 
     private init() {}
 
@@ -62,6 +69,34 @@ final class AppSettings {
     var customAIPolishModelID: String? {
         get { defaults.string(forKey: Self.customAIPolishModelIDKey) }
         set { defaults.set(newValue, forKey: Self.customAIPolishModelIDKey) }
+    }
+
+    var hotkeyPreset: HotkeyPreset {
+        get {
+            guard let raw = defaults.string(forKey: Self.hotkeyPresetKey),
+                  let preset = HotkeyPreset(rawValue: raw) else { return .fnSpace }
+            return preset
+        }
+        set {
+            defaults.set(newValue.rawValue, forKey: Self.hotkeyPresetKey)
+            NotificationCenter.default.post(name: .hotkeyPresetDidChange, object: newValue)
+        }
+    }
+
+    var launchAtLogin: Bool {
+        get { SMAppService.mainApp.status == .enabled }
+        set {
+            let service = SMAppService.mainApp
+            do {
+                if newValue, service.status == .notRegistered {
+                    try service.register()
+                } else if !newValue, service.status != .notRegistered {
+                    try service.unregister()
+                }
+            } catch {
+                AppLogger.general.error("Launch at login update failed: \(error.localizedDescription, privacy: .public)")
+            }
+        }
     }
 
     nonisolated static func cloudTranscriptionModelID() -> String {
