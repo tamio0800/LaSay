@@ -4,11 +4,11 @@
 
 <p align="center">Voice input for developers on macOS.</p>
 
-Hold a shortcut, speak naturally in English, Chinese, or both, then release. LaSay turns your speech into text, keeps technical terms such as `React` and `FastAPI` intact, and copies the result for use in any app.
+Hold a shortcut, speak naturally in English, Chinese, or both, then release. LaSay turns your speech into text and writes it directly into the active text field, while keeping technical terms such as `React` and `FastAPI` intact. A copy is kept as a fallback.
 
 <p align="center"><img src="docs/assets/lasay-demo-en.gif" width="535" alt="LaSay voice input demo"></p>
 
-[繁體中文](README_ZH.md) · [Download the latest DMG](https://github.com/tamio0800/LaSay/releases/latest)
+[繁體中文](README_ZH.md) · [AI agent guide](AGENT_GUIDE.md) · [Contributing](CONTRIBUTING.md) · [Download the latest DMG](https://github.com/tamio0800/LaSay/releases/latest)
 
 ## Install
 
@@ -26,13 +26,20 @@ To update a Homebrew installation:
 brew upgrade --cask lasay
 ```
 
-## Use it
+## First launch and daily use
 
-1. Open **LaSay** from Applications and allow Microphone access.
-2. Hold **Fn + Space** anywhere you can type. You can choose Control + Space or Option + Space in Settings.
-3. Speak, then release the shortcut. LaSay copies the result; paste it with **Command + V**.
+On first launch, LaSay guides you through two one-time permissions:
 
-Accessibility permission is optional. Enable it in LaSay Settings only if you want LaSay to paste automatically at the cursor.
+1. **Microphone**: lets LaSay hear your voice.
+2. **Accessibility**: lets LaSay insert the result into the active text field.
+
+macOS asks you to approve each permission. If one was previously denied, LaSay opens the correct System Settings page. Permissions are detected automatically. Setup then asks you to hold the shortcut and speak into a real test field; setup is complete only after the text appears.
+
+After setup:
+
+1. Hold **Fn + Space** anywhere you can type. You can choose Control + Space or Option + Space in Settings.
+2. Speak naturally, then release. LaSay inserts the result at the cursor.
+3. If automatic insertion is unavailable or fails, the result is still copied. Press **Command + V** to paste it manually.
 
 ## Choose where transcription happens
 
@@ -42,6 +49,8 @@ Accessibility permission is optional. Enable it in LaSay Settings only if you wa
 | **OpenAI cloud** | LaSay sends the recording to OpenAI for transcription. | Required | Depends on your selected model |
 
 LaSay does not require a LaSay account or sync your content. Your OpenAI API key is stored in macOS Keychain. If you enable optional OpenAI text cleanup, the transcribed text is also sent to OpenAI.
+
+With AI Polish off, LaSay applies its built-in technical-term corrections. With AI Polish on, the selected model preserves terms contextually instead.
 
 ## What you get
 

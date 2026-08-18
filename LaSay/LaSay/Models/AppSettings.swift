@@ -176,7 +176,7 @@ final class AppSettings {
     }
 
     var restoreClipboard: Bool {
-        get { defaults.object(forKey: "restore_clipboard") as? Bool ?? true }
+        get { defaults.object(forKey: "restore_clipboard") as? Bool ?? false }
         set { defaults.set(newValue, forKey: "restore_clipboard") }
     }
 

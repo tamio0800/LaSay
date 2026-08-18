@@ -17,11 +17,11 @@ class TextInputService {
     // MARK: - Paste Text
 
     /// 將文字貼到當前游標位置
-    /// Copies text and automatically pastes it only when Accessibility is available.
+    /// Copies text to the clipboard, then sends Command-V for direct input.
     /// The completion receives `true` when Command-V was sent successfully.
     func pasteText(
         _ text: String,
-        restoreClipboard: Bool = true,
+        restoreClipboard: Bool = false,
         completion: ((Bool) -> Void)? = nil
     ) {
         let canAutoPaste = AXIsProcessTrusted()

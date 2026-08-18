@@ -4,11 +4,11 @@
 
 <p align="center">給開發者的 macOS 語音輸入工具。</p>
 
-按住快捷鍵，用中文、英文或中英混合自然說話，再放開。LaSay 會將語音轉成文字、保留 `React`、`FastAPI` 等技術術語，並複製結果，讓你貼到任何 App。
+按住快捷鍵，用中文、英文或中英混合自然說話，再放開。LaSay 會將語音轉成文字，直接輸入到目前的文字欄位，並保留 `React`、`FastAPI` 等技術術語；同時也會保留一份複本作為備援。
 
 <p align="center"><img src="docs/assets/lasay-demo.gif" width="535" alt="LaSay 語音輸入示範"></p>
 
-[English](README.md) · [下載最新版 DMG](https://github.com/tamio0800/LaSay/releases/latest)
+[English](README.md) · [AI Agent 指南](AGENT_GUIDE.md) · [參與貢獻](CONTRIBUTING_ZH.md) · [下載最新版 DMG](https://github.com/tamio0800/LaSay/releases/latest)
 
 ## 安裝
 
@@ -26,13 +26,20 @@ brew tap tamio0800/tap && brew install --cask lasay
 brew upgrade --cask lasay
 ```
 
-## 使用方式
+## 第一次啟動與日常使用
 
-1. 從「應用程式」開啟 **LaSay**，並允許麥克風權限。
-2. 在任何可輸入文字的地方按住 **Fn + Space**。可在設定改為 Control + Space 或 Option + Space。
-3. 說話後放開快捷鍵。LaSay 會複製結果；按 **Command + V** 貼上。
+第一次啟動時，LaSay 會帶你完成兩個只需授予一次的權限：
 
-「輔助使用」是選用權限。只有想讓 LaSay 直接貼到游標位置時，才需要在 LaSay 設定中開啟它。
+1. **麥克風**：讓 LaSay 聽見你的聲音。
+2. **輔助使用**：讓 LaSay 將結果輸入到目前的文字欄位。
+
+macOS 會請你確認每個權限；如果先前曾拒絕，LaSay 會開啟正確的系統設定頁面。LaSay 會自動確認權限，接著請你在真正的測試文字欄位按住快捷鍵並說一句話；只有看到文字出現，設定才算完成。
+
+設定完成後：
+
+1. 在任何可輸入文字的地方按住 **Fn + Space**。可在設定改為 Control + Space 或 Option + Space。
+2. 自然說話後放開快捷鍵，LaSay 會直接把結果輸入到游標位置。
+3. 如果自動輸入無法使用或失敗，結果仍會留在剪貼簿；按 **Command + V** 即可手動貼上。
 
 ## 選擇辨識位置
 
@@ -42,6 +49,8 @@ brew upgrade --cask lasay
 | **OpenAI 雲端** | LaSay 會把錄音傳送到 OpenAI 進行辨識。 | 需要 | 取決於你選的模型 |
 
 LaSay 不需要 LaSay 帳號，也不會同步你的內容。OpenAI API Key 會儲存在 macOS Keychain。若開啟選用的 OpenAI 文字整理，辨識後的文字也會傳送到 OpenAI。
+
+關閉 AI 文字潤飾時，LaSay 會套用內建的技術術語修正；開啟時則由所選模型依上下文保留術語。
 
 ## 你會得到什麼
 

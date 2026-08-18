@@ -1,5 +1,9 @@
 # Repository Guidelines
 
+## User Support Reference
+
+For installation, first-run permissions, configuration, and troubleshooting, read [AGENT_GUIDE.md](AGENT_GUIDE.md) before changing code or asking the user to alter macOS settings. It is written for AI agents helping LaSay users. Use [CONTRIBUTING.md](CONTRIBUTING.md) for the public contribution workflow.
+
 ## Project Structure & Module Organization
 
 This repository contains the LaSay macOS menu-bar app. The Xcode project is at `LaSay/LaSay.xcodeproj`; application code lives under `LaSay/LaSay/`. Keep SwiftUI screens in `Views/`, transcription and system integrations in `Services/`, persisted state in `Models/`, and focused helpers in `Utilities/`. App icons belong in `Assets.xcassets`; bundled speech models and native `sherpa-onnx` headers/libraries live in `Resources/` and `Libraries/`. XCTest sources are in `LaSay/LaSayTests/`.
@@ -35,4 +39,4 @@ Tests use XCTest with `@testable import LaSay`. Add focused regression tests bes
 
 History generally uses short Conventional Commit prefixes such as `feat:`, `fix:`, `refactor:`, and `chore:`. Keep each commit scoped and imperative. Pull requests should explain user-visible behavior, list verification performed, link relevant issues, and include screenshots for SwiftUI, onboarding, settings, or menu-bar changes. Never commit API keys, credentials, build products, DMGs, logs, or Xcode user data.
 
-Use the GitHub account `tamio0800` for all development, commits, and repository operations. Before committing, verify `gh api user --jq .login` returns `tamio0800` and configure this repository with an email associated with that account.
+When working on behalf of the repository owner, use the GitHub account `tamio0800` for development, commits, and repository operations. Before committing, verify `gh api user --jq .login` returns `tamio0800` and configure this repository with an email associated with that account. External contributors use their own accounts and submit pull requests from forks.

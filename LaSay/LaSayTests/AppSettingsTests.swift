@@ -22,9 +22,9 @@ final class AppSettingsTests: XCTestCase {
         super.tearDown()
     }
 
-    func testRestoreClipboardDefaultsToTrue() {
+    func testRestoreClipboardDefaultsToFalse() {
         UserDefaults.standard.removeObject(forKey: "restore_clipboard")
-        XCTAssertTrue(AppSettings.shared.restoreClipboard, "restoreClipboard should default to true when key is absent")
+        XCTAssertFalse(AppSettings.shared.restoreClipboard, "restoreClipboard should default to false so transcription remains recoverable")
     }
 
     func testRestoreClipboardReadsStoredFalse() {
@@ -73,4 +73,5 @@ final class AppSettingsTests: XCTestCase {
 
         XCTAssertEqual(AppSettings.shared.hotkeyPreset, .optionSpace)
     }
+
 }

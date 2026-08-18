@@ -11,7 +11,7 @@ struct SettingsView: View {
     @State private var loginNeedsAttention = false
     @State private var enableAIPolish = false
     @State private var punctuationStyle: PunctuationStyle = .fullWidth
-    @State private var restoreClipboard = true
+    @State private var restoreClipboard = false
     @State private var cloudTranscriptionModel: CloudTranscriptionModel = .automatic
     @State private var customCloudTranscriptionModelID = ""
     @State private var aiPolishModel: AIPolishModel = .automatic
@@ -187,13 +187,13 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Label(
-                        accessibilityGranted ? String(localized: "已啟用自動貼上") : String(localized: "未啟用自動貼上"),
-                        systemImage: accessibilityGranted ? "checkmark.circle.fill" : "doc.on.clipboard"
+                        accessibilityGranted ? String(localized: "已啟用直接輸入") : String(localized: "直接輸入需要權限"),
+                        systemImage: accessibilityGranted ? "checkmark.circle.fill" : "keyboard"
                     )
                     .foregroundStyle(accessibilityGranted ? .green : .secondary)
                     Spacer()
                     if !accessibilityGranted {
-                        Button(String(localized: "開啟系統設定")) {
+                        Button(String(localized: "啟用直接輸入")) {
                             HotkeyManager.shared.requestAccessibilityPermission()
                             if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
                                 NSWorkspace.shared.open(url)
@@ -201,7 +201,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                Text(String(localized: "輔助使用是選用權限；未啟用時，辨識結果會留在剪貼簿，請按 Command-V 貼上。"))
+                Text(String(localized: "LaSay 預設會直接輸入到游標；若自動輸入失敗，結果仍會留在剪貼簿。"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -249,7 +249,6 @@ struct SettingsView: View {
             Toggle(String(localized: "輸入後還原原本的剪貼簿"), isOn: $restoreClipboard)
                 .onChange(of: restoreClipboard) { AppSettings.shared.restoreClipboard = $0 }
 
-            if !needsAPIKey { apiKeySection }
         }
     }
 

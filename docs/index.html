@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LaSay 是給開發者的 macOS 語音輸入工具，保留中英混合的技術術語。">
+  <meta name="theme-color" content="#1a1a1a">
+  <title>LaSay | Voice input for developers</title>
+  <link rel="stylesheet" href="styles.css?v=2">
+  <script>
+    document.documentElement.lang = localStorage.getItem('lasay-language') === 'en' ? 'en' : 'zh-Hant';
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content"><span class="lang-zh">跳至主要內容</span><span class="lang-en">Skip to content</span></a>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="LaSay 首頁 / LaSay home">
+      <img src="assets/lasay-icon.png" alt="" width="38" height="38">
+      <span>LaSay</span>
+    </a>
+    <nav class="site-nav" aria-label="主要導覽 / Primary navigation">
+      <a href="#workflow"><span class="lang-zh">怎麼用</span><span class="lang-en">How it works</span></a>
+      <a href="#privacy"><span class="lang-zh">隱私</span><span class="lang-en">Privacy</span></a>
+      <a href="#proof"><span class="lang-zh">設定</span><span class="lang-en">Settings</span></a>
+    </nav>
+    <div class="header-actions">
+      <a class="text-link" href="https://github.com/tamio0800/LaSay" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+      <div class="language-switch" role="group" aria-label="Choose language">
+        <button type="button" data-lang="zh-Hant" aria-label="切換為繁體中文">中文</button>
+        <button type="button" data-lang="en" aria-label="Switch to English">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title"><span class="lang-zh">給開發者的語音輸入工具。</span><span class="lang-en">Voice input for developers.</span></h1>
+        <p class="hero-lead"><span class="lang-zh">按住 Fn+Space，用中文、英文或中英混合說話；放開後，LaSay 會把文字直接輸入到游標位置，同時保留 React、FastAPI 等技術術語。</span><span class="lang-en">Hold Fn+Space and speak in English, Chinese, or both. Release to write directly at the cursor, with technical terms such as React and FastAPI intact.</span></p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#install"><span class="lang-zh">安裝 LaSay</span><span class="lang-en">Install LaSay</span> <span aria-hidden="true">↓</span></a>
+          <a class="button button-secondary" href="https://github.com/tamio0800/LaSay/releases/latest" target="_blank" rel="noreferrer"><span class="lang-zh">下載 DMG</span><span class="lang-en">Download DMG</span> <span aria-hidden="true">↗</span></a>
+        </div>
+        <p class="hero-note"><span class="lang-zh">適用於 Apple Silicon Mac · 需要 macOS 13.5 或更新版本 · MIT 開源</span><span class="lang-en">For Apple silicon Macs · Requires macOS 13.5 or later · Open source under MIT</span></p>
+      </div>
+
+      <div class="demo-shell" aria-label="LaSay 語音輸入示範 / voice input demo">
+        <div class="demo-topbar">
+          <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>LaSay</span>
+          <span class="demo-version"><span class="lang-zh">在這台 Mac 上</span><span class="lang-en">ON THIS MAC</span></span>
+        </div>
+        <div class="demo-body">
+          <div class="demo-shortcut"><span class="key">Fn</span><span class="plus" aria-hidden="true">+</span><span class="key">Space</span><span class="demo-hint"><span class="lang-zh">按住說話</span><span class="lang-en">hold to speak</span></span></div>
+          <div class="waveform" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="demo-status" aria-live="polite"><span class="status-dot"></span><span id="demo-status-text">Ready</span></div>
+          <div class="demo-editor" aria-label="辨識後的文字 / Transcribed text">
+            <span class="editor-prompt">›</span>
+            <span id="demo-output"></span><span class="cursor" aria-hidden="true"></span>
+          </div>
+          <div class="demo-footer"><span><span class="lang-zh">離線辨識</span><span class="lang-en">Offline transcription</span></span><span id="demo-mode"><span class="lang-zh">音訊不離開裝置</span><span class="lang-en">Audio stays local</span></span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="install section-rule" id="install" aria-labelledby="install-title">
+      <div>
+        <h2 id="install-title"><span class="lang-zh">使用 Homebrew 安裝。</span><span class="lang-en">Install with Homebrew.</span></h2>
+        <p><span class="lang-zh">把這行指令貼到「終端機」來安裝。第一次啟動時，LaSay 需要你一次授予麥克風與輔助使用權限，並確認實際輸入成功。</span><span class="lang-en">Paste this command into Terminal to install. On first launch, LaSay requires both Microphone and Accessibility once, then verifies a real insertion.</span></p>
+      </div>
+      <div class="install-command">
+        <code id="install-code">brew tap tamio0800/tap &amp;&amp; brew install --cask lasay</code>
+        <button type="button" id="copy-install" aria-describedby="copy-status"><span class="lang-zh">複製指令</span><span class="lang-en">Copy command</span></button>
+      </div>
+      <span class="sr-only" id="copy-status" aria-live="polite"></span>
+      <a class="release-link" href="https://github.com/tamio0800/LaSay/releases/latest" target="_blank" rel="noreferrer"><span class="lang-zh">不使用 Homebrew？下載 DMG</span><span class="lang-en">Prefer a DMG? Download it from GitHub</span> <span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section class="workflow section-rule" id="workflow" aria-labelledby="workflow-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="workflow-title"><span class="lang-zh">一個快捷鍵，完成語音輸入。</span><span class="lang-en">One shortcut for voice input.</span></h2>
+          <p><span class="lang-zh">完成兩個權限與一次實際輸入測試後，就能在任何文字欄位直接使用。</span><span class="lang-en">After granting both permissions and completing one real typing test, use LaSay in any text field.</span></p>
+        </div>
+      </div>
+      <ol class="workflow-list">
+        <li><span class="step-number">01</span><div><h3><span class="lang-zh">按住快捷鍵</span><span class="lang-en">Hold the shortcut</span></h3><p><span class="lang-zh">預設是 Fn+Space，也能在設定中改成 Control+Space 或 Option+Space。</span><span class="lang-en">The default is Fn+Space. You can also choose Control+Space or Option+Space in Settings.</span></p></div></li>
+        <li><span class="step-number">02</span><div><h3><span class="lang-zh">自然說話</span><span class="lang-en">Speak naturally</span></h3><p><span class="lang-zh">中文、英文可以混著說，技術術語不用刻意改念法。</span><span class="lang-en">Speak in English, Chinese, or both. You do not need to change how you say technical terms.</span></p></div></li>
+        <li><span class="step-number">03</span><div><h3><span class="lang-zh">放開，直接輸入</span><span class="lang-en">Release to insert</span></h3><p><span class="lang-zh">授予一次麥克風與輔助使用權限後，LaSay 會把文字直接輸入到游標位置；若自動輸入失敗，按 Command+V 使用剪貼簿備援。</span><span class="lang-en">After you grant Microphone and Accessibility once, LaSay writes directly at the cursor. If automatic insertion fails, press Command+V to use the clipboard fallback.</span></p></div></li>
+      </ol>
+    </section>
+
+    <section class="privacy section-rule" id="privacy" aria-labelledby="privacy-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="privacy-title"><span class="lang-zh">選擇在本機或 OpenAI 辨識。</span><span class="lang-en">Choose local or OpenAI transcription.</span></h2>
+          <p><span class="lang-zh">本機模式不會上傳音訊；雲端模式使用你的 OpenAI API Key。</span><span class="lang-en">Local mode keeps audio on your Mac. Cloud mode uses your OpenAI API key.</span></p>
+        </div>
+      </div>
+      <div class="privacy-columns">
+        <div class="privacy-block"><h3><span class="lang-zh">本機模式</span><span class="lang-en">Local mode</span></h3><p><span class="lang-zh">SenseVoiceSmall 模型已內建，音訊只在你的 Mac 上處理，不需要 API Key。</span><span class="lang-en">SenseVoiceSmall is included. Audio stays on your Mac, and no API key is required.</span></p><span class="detail-line">SenseVoiceSmall · offline</span></div>
+        <div class="privacy-block"><h3><span class="lang-zh">OpenAI 雲端模式</span><span class="lang-en">OpenAI cloud mode</span></h3><p><span class="lang-zh">LaSay 會把錄音傳送到 OpenAI 進行辨識。你的 API Key 會儲存在 macOS Keychain。</span><span class="lang-en">LaSay sends recordings to OpenAI for transcription. Your API key is stored in macOS Keychain.</span></p><span class="detail-line">OpenAI · optional · Keychain</span></div>
+      </div>
+      <p class="privacy-footnote"><span class="lang-zh">LaSay 不需要帳號，也不會同步你的文字或設定。</span><span class="lang-en">LaSay does not require an account or sync your text or settings.</span></p>
+    </section>
+
+    <section class="language-proof section-rule" aria-labelledby="language-title">
+      <div class="language-proof-copy">
+        <h2 id="language-title"><span class="lang-zh">保留技術術語與程式名稱。</span><span class="lang-en">Keep technical terms and code names intact.</span></h2>
+        <p><span class="lang-zh">LaSay 內建技術術語修正，能保留框架名稱、程式碼識別字和常見縮寫。</span><span class="lang-en">LaSay includes technical-term corrections for framework names, code identifiers, and common abbreviations.</span></p>
+      </div>
+      <div class="language-example" aria-label="Mixed language example">
+        <p class="example-label"><span class="lang-zh">你說</span><span class="lang-en">You say</span></p>
+        <p class="example-speech"><span class="lang-zh">「幫我 refactor 這個 useEffect hook，然後在 FastAPI endpoint 加上 retry logic。」</span><span class="lang-en">“Refactor this useEffect hook, then add retry logic to the FastAPI endpoint.”</span></p>
+        <p class="example-label"><span class="lang-zh">LaSay 產生</span><span class="lang-en">LaSay writes</span></p>
+        <p class="example-result"><span class="lang-zh">幫我 refactor 這個 useEffect hook，然後在 FastAPI endpoint 加上 retry logic。</span><span class="lang-en">Refactor this useEffect hook, then add retry logic to the FastAPI endpoint.</span></p>
+      </div>
+    </section>
+
+    <section class="proof section-rule" id="proof" aria-labelledby="proof-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="proof-title"><span class="lang-zh">設定保持簡單。</span><span class="lang-en">Settings stay simple.</span></h2>
+          <p><span class="lang-zh">第一次啟動會引導你授予麥克風與輔助使用權限，並完成一次實際輸入測試；之後文字預設會直接輸入到游標位置。</span><span class="lang-en">First launch guides you through Microphone and Accessibility, then verifies one real insertion. After that, text goes directly to the cursor by default.</span></p>
+        </div>
+      </div>
+      <figure class="product-proof">
+        <img id="settings-image" src="assets/settings-zh.png" alt="LaSay 設定：離線辨識、自動偵測語言、快捷鍵與登入啟動。">
+        <figcaption><span class="lang-zh">LaSay 設定：離線辨識、自動偵測語言、快捷鍵與登入啟動。</span><span class="lang-en">LaSay Settings: offline transcription, automatic language detection, shortcut, and launch at login.</span></figcaption>
+      </figure>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <span>LaSay · <span class="lang-zh">給開發者的語音輸入</span><span class="lang-en">Voice input for developers</span></span>
+    <span class="footer-links"><a href="https://github.com/tamio0800/LaSay" target="_blank" rel="noreferrer">GitHub</a><a href="https://github.com/tamio0800/LaSay/blob/master/LICENSE" target="_blank" rel="noreferrer">MIT License</a></span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

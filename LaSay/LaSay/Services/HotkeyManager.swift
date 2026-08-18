@@ -81,9 +81,9 @@ final class HotkeyManager {
         set { AppSettings.shared.hotkeyPreset = newValue }
     }
 
-    // MARK: - Optional Accessibility Permission
+    // MARK: - Direct Input Permission
 
-    /// Accessibility is only needed to synthesize Command-V, not for the hotkey.
+    /// Accessibility enables direct input by synthesizing Command-V; the hotkey itself works without it.
     func checkAccessibilityPermission() -> Bool {
         AXIsProcessTrusted()
     }
