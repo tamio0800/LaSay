@@ -1,156 +1,72 @@
 # LaSay
 
-Homebrew 安裝：`brew install --cask tamio0800/tap/lasay`
+<p align="center"><img src="lasay-icon.png" width="112" alt="LaSay 圖示"></p>
 
-給開發者的語音輸入工具。用母語口述，夾雜英文技術術語 -- LaSay 原封不動保留。
+<p align="center">給開發者的 macOS 語音輸入工具。</p>
 
-[English](README.md)
+按住快捷鍵，用中文、英文或中英混合自然說話，再放開。LaSay 會將語音轉成文字、保留 `React`、`FastAPI` 等技術術語，並複製結果，讓你貼到任何 App。
 
-<p align="center"><img src="lasay-icon.png" width="128" alt="LaSay 圖示"></p>
+<p align="center"><img src="docs/assets/lasay-demo.gif" width="535" alt="LaSay 語音輸入示範"></p>
 
-[![CI](https://github.com/tamio0800/LaSay/actions/workflows/ci.yml/badge.svg)](https://github.com/tamio0800/LaSay/actions/workflows/ci.yml)
+[English](README.md) · [下載最新版 DMG](https://github.com/tamio0800/LaSay/releases/latest)
 
-## 為什麼需要 LaSay
+## 安裝
 
-開發者用混合語言思考。你用中文說「幫我 refactor 那個 useEffect hook」，所有語音工具都會把 useEffect 轉成亂碼。LaSay 內建 300+ 技術術語字典加上 AI 後處理，框架名稱、程式碼識別字、技術用語全部原樣保留。
+把這行指令貼到「終端機」。它會加入 LaSay 的 Homebrew 軟體來源，並安裝 App。
 
-**按住 Fn+Space，說話，放開，文字出現在游標。**
-
-任何 app 都能用 -- VS Code、Terminal、Slack、瀏覽器，任何有輸入框的地方。
-
-首次啟動時，依提示授予麥克風與輔助使用權限。預設按住 Fn+Space 口述；從選單列圖示開啟設定，簽章版本可自動檢查更新。
-
-## 功能
-
-- **混語言轉錄** -- 母語 + 英文技術術語混著說
-- **300+ 術語保留** -- React、FastAPI、Kubernetes、camelCase 識別字全部保留
-- **雙轉錄模式** -- 雲端（OpenAI，可選模型）或本地（SenseVoice，完全離線）
-- **AI 文字清理** -- 去贅字、修文法、保留術語，可選擇 OpenAI 模型
-- **可調整按住說話快捷鍵** -- 預設 Fn+Space，也可選 Control+Space 或 Option+Space
-- **即時貼上** -- 轉錄完成的瞬間，文字出現在游標位置
-- **安全儲存** -- API Key 存在 macOS Keychain
-
-## 快速開始
-
-```
-1. brew install --cask tamio0800/tap/lasay
-2. 開啟 LaSay，授予麥克風 + 輔助使用權限
-3. 在任何地方按住 Fn+Space 開始口述
-4. 選用：從選單列圖示設定 OpenAI 或更改快捷鍵
+```bash
+brew tap tamio0800/tap && brew install --cask lasay
 ```
 
-不用註冊。不用登入。不用雲端同步。你的 API Key，你的資料。
+不使用 Homebrew？從 [GitHub Releases](https://github.com/tamio0800/LaSay/releases/latest) 下載 DMG，再把 LaSay 拖到「應用程式」。
 
-![LaSay 首次啟動權限設定](docs/screenshots/onboarding.png)
+已透過 Homebrew 安裝時，使用這行更新：
 
-## 架構
-
-```
-Fn+Space（按住）
-    │
-    ▼
-AudioRecorder（16kHz mono AAC）
-    │
-    ├─► 雲端：OpenAI 轉錄 API ─────► 轉錄
-    │
-    └─► 本地：SenseVoice ──────────► 轉錄
-                                       │
-                                       ▼
-                                TechTermsDictionary
-                                （300+ regex 術語修正）
-                                       │
-                                       ▼
-                                AI 清理（選配）
-                                可選 OpenAI 模型
-                                       │
-                                       ▼
-                                自動貼上至游標
+```bash
+brew upgrade --cask lasay
 ```
 
-## 轉錄模式比較
+## 使用方式
 
-| 模式 | 引擎 | 延遲 | 費用 | 離線 |
-|------|------|------|------|------|
-| 雲端 | OpenAI 轉錄 API | 依模型而異 | 依模型而異 | 否 |
-| 本地 | SenseVoiceSmall (int8) | ~2-4 秒 | 免費 | 是 |
+1. 從「應用程式」開啟 **LaSay**，並允許麥克風權限。
+2. 在任何可輸入文字的地方按住 **Fn + Space**。可在設定改為 Control + Space 或 Option + Space。
+3. 說話後放開快捷鍵。LaSay 會複製結果；按 **Command + V** 貼上。
 
-SenseVoiceSmall 模型已內建於 App，本地模式不需要另外下載。
+「輔助使用」是選用權限。只有想讓 LaSay 直接貼到游標位置時，才需要在 LaSay 設定中開啟它。
 
-## 設定
+## 選擇辨識位置
 
-### 權限
+| 模式 | 會發生什麼事 | API Key | 費用 |
+| --- | --- | --- | --- |
+| **本機（預設）** | 內建的 SenseVoiceSmall 模型在你的 Mac 處理錄音。 | 不需要 | 免費 |
+| **OpenAI 雲端** | LaSay 會把錄音傳送到 OpenAI 進行辨識。 | 需要 | 取決於你選的模型 |
 
-LaSay 需要兩個 macOS 權限：
+LaSay 不需要 LaSay 帳號，也不會同步你的內容。OpenAI API Key 會儲存在 macOS Keychain。若開啟選用的 OpenAI 文字整理，辨識後的文字也會傳送到 OpenAI。
 
-- **麥克風** -- 系統設定 > 隱私權與安全性 > 麥克風
-- **輔助使用** -- 系統設定 > 隱私權與安全性 > 輔助使用（全域快捷鍵需要）
+## 你會得到什麼
 
-首次設定各授予一次即可；LaSay 會立即啟用快捷鍵，不需要重新啟動。
-
-### 設定選項
-
-從 menu bar 圖示 > 設定進入：
-
-- **轉錄模式** -- 雲端或本地
-- **OpenAI 模型** -- 推薦設定、指定模型或自訂 Model ID
-- **轉錄語言** -- 自動 / 中文 / 英文 / 日文 / 韓文
-- **AI 文字清理** -- 開關切換，支援自訂 prompt
-- **API Key** -- 雲端模式和 AI 清理需要
-
-### API Key
-
-雲端模式和 AI 文字清理需要 API Key。從 [platform.openai.com/api-keys](https://platform.openai.com/api-keys) 取得。
-
-存在 macOS Keychain，不是 UserDefaults，不是明文檔案。
-
-## 費用
-
-雲端轉錄與 AI 文字清理的費用取決於所選 OpenAI 模型；本地模式免費。請在設定中依準確度、速度與費用選擇模型。
-
-## 支援語言
-
-轉錄：自動偵測、中文（zh）、英文（en）、日文（ja）、韓文（ko）
-
-介面：繁體中文、English
-
-## 常見問題
-
-**快捷鍵沒反應？**
-開啟 LaSay 並依照權限設定操作；授予輔助使用權限後，快捷鍵會立即生效。
-
-**Terminal 能用嗎？**
-可以，透過模擬 Cmd+V 貼上。部分終端模擬器可能需要額外設定。
-
-**術語修正準確嗎？**
-字典涵蓋 300+ 術語，橫跨主要程式語言（Python、JavaScript、TypeScript、Swift、Rust、Java、C/C++/C#）、框架（React、FastAPI、Django、Spring）、資料庫（PostgreSQL、MongoDB、Redis）、DevOps 工具（Docker、Kubernetes、Terraform）及常見縮寫（API、SDK、CI/CD、ORM）。
-
-**不用 API Key 能用嗎？**
-可以。切換到本地模式，SenseVoice 完全在你的電腦上執行。AI 文字清理需要 API Key。
-
-**API Key 存在哪？**
-macOS Keychain（透過 Security framework）。不在 UserDefaults，不在明文檔案。
+- 在 VS Code、Terminal、Slack、瀏覽器與其他文字欄位按住說話
+- 英文、繁體中文、日文、韓文，以及自動偵測語言
+- 內建技術術語修正，協助保留框架名稱、程式碼識別字與常見縮寫
+- 選用的 OpenAI 辨識、文字整理與自訂模型 ID
+- 簡潔的選單列 App，支援登入後啟動與自訂快捷鍵
 
 ## 系統需求
 
-- macOS 13.5（Ventura）或更新
 - Apple Silicon Mac
-- 網路連線（僅雲端模式）
-- OpenAI API Key（雲端模式和 AI 清理）
+- macOS 13.5（Ventura）或更新版本
+- 只有 OpenAI 功能需要網路與 OpenAI API Key
 
 ## 從原始碼建置
 
 ```bash
 git clone https://github.com/tamio0800/LaSay.git
-cd LaSay/LaSay
-open LaSay.xcodeproj
+cd LaSay
+open LaSay/LaSay.xcodeproj
 ```
 
-請在 Xcode 選擇 Apple Development signing team。不要使用 ad-hoc 簽章，否則每次 rebuild 後 App 身分會改變，macOS 可能要求重新授予隱私權限。
+在 Xcode 選擇自己的 Apple Development signing team，接著按 **Command + B** 建置。Xcode 會自動處理專案包含的相依項目。
 
 ## 授權
 
-LaSay 原始碼採 [MIT License](LICENSE)；內建模型與第三方元件各自適用其授權。完整來源、版本與聲明請見 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
-
----
-
-[Tamio Tsiu](mailto:tamio.tsiu@gmail.com)
+LaSay 原始碼採 [MIT License](LICENSE)。內建模型與原生 runtime 各自適用其授權；完整聲明請見 [Third-Party Notices](THIRD_PARTY_NOTICES.md)。

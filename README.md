@@ -1,163 +1,72 @@
 # LaSay
 
-Install with Homebrew: `brew install --cask tamio0800/tap/lasay`
+<p align="center"><img src="lasay-icon.png" width="112" alt="LaSay icon"></p>
 
-Voice input for developers. Dictate in your native language with English technical terms -- LaSay keeps them intact.
+<p align="center">Voice input for developers on macOS.</p>
 
-[繁體中文說明](README_ZH.md)
+Hold a shortcut, speak naturally in English, Chinese, or both, then release. LaSay turns your speech into text, keeps technical terms such as `React` and `FastAPI` intact, and copies the result for use in any app.
 
-<p align="center"><img src="lasay-icon.png" width="128" alt="LaSay icon"></p>
+<p align="center"><img src="docs/assets/lasay-demo-en.gif" width="535" alt="LaSay voice input demo"></p>
 
-[![CI](https://github.com/tamio0800/LaSay/actions/workflows/ci.yml/badge.svg)](https://github.com/tamio0800/LaSay/actions/workflows/ci.yml)
-![macOS](https://img.shields.io/badge/macOS-13.5+-blue)
-![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-required-black)
-![Swift](https://img.shields.io/badge/Swift-5-orange)
-![License](https://img.shields.io/badge/code-MIT-green)
+[繁體中文](README_ZH.md) · [Download the latest DMG](https://github.com/tamio0800/LaSay/releases/latest)
 
-## Why LaSay
+## Install
 
-Developers think in mixed languages. You say "help me refactor the useEffect hook" in Mandarin, and every transcription tool mangles "useEffect" into nonsense. LaSay solves this with a 300+ term technical dictionary and AI post-processing that preserves code identifiers, framework names, and technical jargon exactly as spoken.
+Paste this one command into Terminal. It adds LaSay's Homebrew source, then installs the app.
 
-**Hold Fn+Space. Speak. Release. Text appears at your cursor.**
-
-Works in any app -- VS Code, Terminal, Slack, browser, anywhere you type.
-
-First launch: grant Microphone and Accessibility access when prompted. Hold Fn+Space to dictate, use the menu-bar icon for Settings, and signed releases can check for updates automatically.
-
-## Features
-
-- **Mixed-language transcription** -- speak your native language with English technical terms
-- **300+ technical terms preserved** -- React, FastAPI, Kubernetes, camelCase identifiers, all kept intact
-- **Two transcription modes** -- Cloud (configurable OpenAI model) or Local (SenseVoice, fully offline)
-- **AI text cleanup** -- removes filler words, fixes grammar, and supports configurable OpenAI models
-- **Configurable push-to-talk** -- Fn+Space by default; Control+Space and Option+Space are available
-- **Instant paste** -- text appears at your cursor the moment transcription completes
-- **Secure storage** -- API keys stored in macOS Keychain
-
-## Quick Start
-
-```
-1. brew install --cask tamio0800/tap/lasay
-2. Open LaSay and grant Microphone + Accessibility permissions
-3. Hold Fn+Space anywhere to dictate
-4. Optional: configure OpenAI or the shortcut from the menu-bar icon
+```bash
+brew tap tamio0800/tap && brew install --cask lasay
 ```
 
-No account. No signup. No cloud sync. Your API key, your data.
+Prefer a DMG? Download the app from [GitHub Releases](https://github.com/tamio0800/LaSay/releases/latest), then drag LaSay to Applications.
 
-![LaSay first-launch permission setup](docs/screenshots/onboarding.png)
+To update a Homebrew installation:
 
-## Architecture
-
-```
-Fn+Space (hold)
-    │
-    ▼
-AudioRecorder (16kHz mono AAC)
-    │
-    ├─► Cloud: OpenAI Transcription API ► transcription
-    │
-    └─► Local: SenseVoice ──────────► transcription
-                                          │
-                                          ▼
-                                   TechTermsDictionary
-                                   (300+ regex corrections)
-                                          │
-                                          ▼
-                                   AI Polish (optional)
-                                   Configurable OpenAI model
-                                          │
-                                          ▼
-                                   Auto-paste at cursor
+```bash
+brew upgrade --cask lasay
 ```
 
-## Transcription Modes
+## Use it
 
-| Mode | Engine | Latency | Cost | Offline |
-|------|--------|---------|------|---------|
-| Cloud | OpenAI Transcription API | Model-dependent | Model-dependent | No |
-| Local | SenseVoiceSmall (int8) | ~2-4s | Free | Yes |
+1. Open **LaSay** from Applications and allow Microphone access.
+2. Hold **Fn + Space** anywhere you can type. You can choose Control + Space or Option + Space in Settings.
+3. Speak, then release the shortcut. LaSay copies the result; paste it with **Command + V**.
 
-The SenseVoiceSmall model is bundled with the app, so local mode requires no download.
+Accessibility permission is optional. Enable it in LaSay Settings only if you want LaSay to paste automatically at the cursor.
 
-## Configuration
+## Choose where transcription happens
 
-### Permissions
+| Mode | What happens | API key | Cost |
+| --- | --- | --- | --- |
+| **Local (default)** | The included SenseVoiceSmall model processes recorded audio on your Mac. | Not needed | Free |
+| **OpenAI cloud** | LaSay sends the recording to OpenAI for transcription. | Required | Depends on your selected model |
 
-LaSay requires two macOS permissions:
+LaSay does not require a LaSay account or sync your content. Your OpenAI API key is stored in macOS Keychain. If you enable optional OpenAI text cleanup, the transcribed text is also sent to OpenAI.
 
-- **Microphone** -- System Settings > Privacy & Security > Microphone
-- **Accessibility** -- System Settings > Privacy & Security > Accessibility (for global hotkey)
+## What you get
 
-Grant both once in onboarding. LaSay activates the hotkey immediately; no restart is required.
+- Push-to-talk voice input in VS Code, Terminal, Slack, browsers, and other text fields
+- English, Traditional Chinese, Japanese, Korean, and automatic language detection
+- Built-in technical-term corrections for framework names, code identifiers, and common abbreviations
+- Optional OpenAI transcription, text cleanup, and custom model IDs
+- A simple menu-bar app with launch-at-login and configurable shortcuts
 
-### Settings
+## Requirements
 
-Access via menu bar icon > Settings:
-
-- **Transcription mode** -- Cloud or Local
-- **OpenAI models** -- recommended defaults, named choices, or a custom model ID
-- **Transcription language** -- Auto / Chinese / English / Japanese / Korean
-- **AI text cleanup** -- toggle on/off, custom prompt supported
-- **API Key** -- required for Cloud mode and AI cleanup
-
-### API Key
-
-Required for Cloud mode and AI text cleanup. Get one at [platform.openai.com/api-keys](https://platform.openai.com/api-keys).
-
-Stored in macOS Keychain (not UserDefaults, not plaintext).
-
-## Cost
-
-Cloud transcription and AI cleanup costs depend on the selected OpenAI models. Local mode is free; choose models in Settings based on accuracy, speed, and cost.
-
-## Supported Languages
-
-Transcription: Auto-detect, Chinese (zh), English (en), Japanese (ja), Korean (ko)
-
-UI: Traditional Chinese, English
-
-## FAQ
-
-**Hotkey not working?**
-Open LaSay and follow the permission setup. The hotkey activates as soon as Accessibility access is granted.
-
-**Works in Terminal?**
-Yes, via simulated Cmd+V paste. Some terminal emulators may require additional configuration.
-
-**How accurate is the technical term preservation?**
-The dictionary covers 300+ terms across major languages (Python, JavaScript, TypeScript, Swift, Rust, Java, C/C++/C#), frameworks (React, FastAPI, Django, Spring), databases (PostgreSQL, MongoDB, Redis), DevOps tools (Docker, Kubernetes, Terraform), and common abbreviations (API, SDK, CI/CD, ORM).
-
-**Can I use it without an API key?**
-Yes. Switch to Local mode -- SenseVoice runs entirely on your machine. AI text cleanup requires an API key.
-
-**Where is my API key stored?**
-In macOS Keychain via the Security framework. Not in UserDefaults, not in plaintext files.
-
-## System Requirements
-
+- Apple silicon Mac
 - macOS 13.5 (Ventura) or later
-- Apple Silicon Mac
-- Internet connection (Cloud mode only)
-- OpenAI API key (Cloud mode and AI cleanup)
+- Internet connection and an OpenAI API key only for OpenAI features
 
-## Build from Source
+## Build from source
 
 ```bash
 git clone https://github.com/tamio0800/LaSay.git
-cd LaSay/LaSay
-open LaSay.xcodeproj
-# Xcode → Product → Build (Cmd+B)
+cd LaSay
+open LaSay/LaSay.xcodeproj
 ```
 
-Use an Apple Development signing team in Xcode. Ad-hoc signing changes the app's identity after rebuilds and causes macOS privacy permissions to reset. No CocoaPods or SPM setup is required; the pinned native runtime and model are bundled.
+Choose your Apple Development signing team in Xcode, then build with **Command + B**. Xcode resolves the included dependencies automatically.
 
 ## License
 
-LaSay's original source code is available under the [MIT License](LICENSE).
-The bundled SenseVoiceSmall model and native runtime retain their own licenses;
-see [Third-Party Notices](THIRD_PARTY_NOTICES.md).
-
----
-
-Built by [Tamio Tsiu](mailto:tamio.tsiu@gmail.com)
+LaSay's original source code is available under the [MIT License](LICENSE). The bundled model and native runtime retain their own licenses; see [Third-Party Notices](THIRD_PARTY_NOTICES.md).
