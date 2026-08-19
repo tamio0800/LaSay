@@ -10,7 +10,7 @@ LaSay runs on Apple silicon Macs with macOS 13.5 or later. Install it with:
 brew tap tamio0800/tap && brew install --cask lasay
 ```
 
-For updates, run `brew upgrade --cask lasay`. A DMG is also available from the GitHub Releases page. Start the app with `open -a LaSay` or from Applications.
+Use the updater that matches the installation method: Homebrew installations use `brew upgrade --cask lasay`; DMG installations use **Check for Updates…** in LaSay Settings. Do not mix the two update paths. A DMG is also available from the GitHub Releases page. Start the app with `open -a LaSay` or from Applications.
 
 ## First-run success criteria
 
@@ -28,6 +28,6 @@ Do not replace files inside `/Applications/LaSay.app`: that breaks the app signa
 
 ## Troubleshooting and contributions
 
-Check that the target app has an active editable field, then rerun setup before diagnosing transcription. Do not reset macOS privacy databases or alter system permissions outside the normal Settings flow.
+Check that the target app has an active editable field, then rerun setup before diagnosing transcription. Do not reset macOS privacy databases or alter system permissions outside the normal Settings flow. If LaSay says Accessibility is missing while System Settings already shows LaSay enabled, the permission record is stale: remove only the LaSay row with **–**, add `/Applications/LaSay.app` with **+**, enable it, then reopen LaSay. This is a user-approved system-permission change; do not touch other rows.
 
 For source changes, read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md), use a fork and pull request, and do not commit credentials, build products, models, DMGs, or Xcode user data. Maintainer release signing and notarization are not contributor tasks.

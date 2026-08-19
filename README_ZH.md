@@ -20,11 +20,15 @@ brew tap tamio0800/tap && brew install --cask lasay
 
 不使用 Homebrew？從 [GitHub Releases](https://github.com/tamio0800/LaSay/releases/latest) 下載 DMG，再把 LaSay 拖到「應用程式」。
 
-已透過 Homebrew 安裝時，使用這行更新：
+### 更新
+
+透過 Homebrew 安裝時，先結束 LaSay，再使用這行更新：
 
 ```bash
 brew upgrade --cask lasay
 ```
+
+透過 DMG 安裝時，在 LaSay 設定按 **檢查更新…**。請依照原本的安裝方式更新；Homebrew 安裝就使用 Homebrew。正常的簽章更新會保留麥克風與輔助使用權限。
 
 ## 第一次啟動與日常使用
 

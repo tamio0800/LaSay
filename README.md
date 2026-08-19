@@ -20,11 +20,15 @@ brew tap tamio0800/tap && brew install --cask lasay
 
 Prefer a DMG? Download the app from [GitHub Releases](https://github.com/tamio0800/LaSay/releases/latest), then drag LaSay to Applications.
 
-To update a Homebrew installation:
+### Updates
+
+For a Homebrew installation, quit LaSay first, then run:
 
 ```bash
 brew upgrade --cask lasay
 ```
+
+For a DMG installation, choose **Check for Updates…** in LaSay Settings. Use the updater that matches how LaSay was installed; Homebrew installs should use Homebrew. Normal signed updates keep Microphone and Accessibility permissions.
 
 ## First launch and daily use
 
