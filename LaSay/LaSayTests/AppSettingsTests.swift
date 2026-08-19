@@ -9,7 +9,8 @@ final class AppSettingsTests: XCTestCase {
         "custom_cloud_transcription_model_id",
         "ai_polish_model",
         "custom_ai_polish_model_id",
-        "hotkey_preset"
+        "hotkey_preset",
+        "chinese_output_script"
     ]
 
     override func setUp() {
@@ -72,6 +73,12 @@ final class AppSettingsTests: XCTestCase {
         AppSettings.shared.hotkeyPreset = .optionSpace
 
         XCTAssertEqual(AppSettings.shared.hotkeyPreset, .optionSpace)
+    }
+
+    func testChineseOutputScriptDefaultsToTraditionalAndPersists() {
+        XCTAssertEqual(AppSettings.shared.chineseOutputScript, .traditional)
+        AppSettings.shared.chineseOutputScript = .simplified
+        XCTAssertEqual(AppSettings.shared.chineseOutputScript, .simplified)
     }
 
 }

@@ -26,21 +26,21 @@ final class AppSettings {
     nonisolated private static let aiPolishModelKey = "ai_polish_model"
     nonisolated private static let customAIPolishModelIDKey = "custom_ai_polish_model_id"
     nonisolated private static let hotkeyPresetKey = "hotkey_preset"
+    nonisolated private static let chineseOutputScriptKey = "chinese_output_script"
 
     private init() {}
+
+    var chineseOutputScript: ChineseOutputScript {
+        get {
+            defaults.string(forKey: Self.chineseOutputScriptKey)
+                .flatMap(ChineseOutputScript.init(rawValue:)) ?? .traditional
+        }
+        set { defaults.set(newValue.rawValue, forKey: Self.chineseOutputScriptKey) }
+    }
 
     var transcriptionMode: TranscriptionMode {
         get { defaults.string(forKey: "transcription_mode").flatMap(TranscriptionMode.init(rawValue:)) ?? .senseVoice }
         set { defaults.set(newValue.rawValue, forKey: "transcription_mode") }
-    }
-
-    var transcriptionLanguage: TranscriptionLanguage {
-        get {
-            guard let raw = defaults.string(forKey: "transcription_language"),
-                  let lang = TranscriptionLanguage(rawValue: raw) else { return .auto }
-            return lang
-        }
-        set { defaults.set(newValue.rawValue, forKey: "transcription_language") }
     }
 
     var cloudTranscriptionModel: CloudTranscriptionModel {
@@ -149,15 +149,6 @@ final class AppSettings {
             return customID
         }
         return selection
-    }
-
-    var punctuationStyle: PunctuationStyle {
-        get {
-            guard let raw = defaults.string(forKey: "punctuation_style"),
-                  let style = PunctuationStyle(rawValue: raw) else { return .fullWidth }
-            return style
-        }
-        set { defaults.set(newValue.rawValue, forKey: "punctuation_style") }
     }
 
     var enableAIPolish: Bool {

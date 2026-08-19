@@ -209,11 +209,12 @@
 				};
 			};
 			buildConfigurationList = 31E4AED72F262512002093FB /* Build configuration list for PBXProject "LaSay" */;
-			developmentRegion = "zh-Hant";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				"zh-Hant",
+				"zh-Hans",
 				Base,
 			);
 			mainGroup = 31E4AED32F262512002093FB;
@@ -403,7 +404,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CODE_SIGN_ENTITLEMENTS = LaSay/LaSay.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = BGRL67W69Y;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -431,7 +432,7 @@
 					"$(PROJECT_DIR)/LaSay/Libraries/sherpa-onnx/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				OTHER_LDFLAGS = (
 					"-lstdc++",
 					"-Wl,-no_warn_duplicate_libraries",
@@ -457,7 +458,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CODE_SIGN_ENTITLEMENTS = LaSay/LaSay.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = BGRL67W69Y;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -485,7 +486,7 @@
 					"$(PROJECT_DIR)/LaSay/Libraries/sherpa-onnx/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				OTHER_LDFLAGS = (
 					"-lstdc++",
 					"-Wl,-no_warn_duplicate_libraries",

@@ -39,12 +39,20 @@ final class MenuBarManager: NSObject {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem?.button {
-            button.setAccessibilityLabel(String(localized: "LaSay 語音輸入"))
+            button.setAccessibilityLabel(AppLocalizer.string("LaSay 語音輸入"))
             updateMenuBarIcon()
         }
 
         setupMenu()
         observeStateChanges()
+        NotificationCenter.default.addObserver(
+            forName: .interfaceLanguageDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.updateMenuBarIcon()
+            self?.setupMenu()
+        }
 
     }
 
@@ -54,11 +62,11 @@ final class MenuBarManager: NSObject {
         let statusText: String
         switch appState.status {
         case .idle:
-            statusText = String(localized: "待機")
+            statusText = AppLocalizer.string("待機")
         case .recording:
-            statusText = String(localized: "錄音中...")
+            statusText = AppLocalizer.string("錄音中...")
         case .processing:
-            statusText = String(localized: "處理中...")
+            statusText = AppLocalizer.string("處理中...")
         }
         let statusMenuItem = NSMenuItem(title: statusText, action: nil, keyEquivalent: "")
         statusMenuItem.isEnabled = false
@@ -66,23 +74,23 @@ final class MenuBarManager: NSObject {
 
         menu.addItem(NSMenuItem.separator())
 
-        let settingsItem = NSMenuItem(title: String(localized: "設定..."), action: #selector(openSettings), keyEquivalent: ",")
+        let settingsItem = NSMenuItem(title: AppLocalizer.string("設定..."), action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
 
-        let setupItem = NSMenuItem(title: String(localized: "重新執行設定..."), action: #selector(runSetup), keyEquivalent: "")
+        let setupItem = NSMenuItem(title: AppLocalizer.string("重新執行設定..."), action: #selector(runSetup), keyEquivalent: "")
         setupItem.target = self
         menu.addItem(setupItem)
 
-        let updateItem = NSMenuItem(title: String(localized: "檢查更新..."), action: #selector(checkForUpdates), keyEquivalent: "")
+        let updateItem = NSMenuItem(title: AppLocalizer.string("檢查更新..."), action: #selector(checkForUpdates), keyEquivalent: "")
         updateItem.target = self
         menu.addItem(updateItem)
 
-        let aboutItem = NSMenuItem(title: String(localized: "關於 LaSay"), action: #selector(showAbout), keyEquivalent: "")
+        let aboutItem = NSMenuItem(title: AppLocalizer.string("關於 LaSay"), action: #selector(showAbout), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
 
-        let quitItem = NSMenuItem(title: String(localized: "結束 LaSay"), action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: AppLocalizer.string("結束 LaSay"), action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 
@@ -112,17 +120,17 @@ final class MenuBarManager: NSObject {
         let statusText: String
         switch status {
         case .idle:
-            statusText = String(localized: "待機")
+            statusText = AppLocalizer.string("待機")
         case .recording:
-            statusText = String(localized: "錄音中...")
+            statusText = AppLocalizer.string("錄音中...")
         case .processing:
-            statusText = String(localized: "處理中...")
+            statusText = AppLocalizer.string("處理中...")
         }
         
-        button.setAccessibilityLabel("\(String(localized: "LaSay 語音輸入")) - \(statusText)")
+        button.setAccessibilityLabel("\(AppLocalizer.string("LaSay 語音輸入")) - \(statusText)")
         
         // Post accessibility announcement for state changes
-        let announcement = "\(String(localized: "LaSay 語音輸入")) \(statusText)"
+        let announcement = "\(AppLocalizer.string("LaSay 語音輸入")) \(statusText)"
         NSAccessibility.post(element: button, notification: .announcementRequested, userInfo: [
             .announcement: announcement,
             .priority: NSAccessibilityPriorityLevel.high.rawValue

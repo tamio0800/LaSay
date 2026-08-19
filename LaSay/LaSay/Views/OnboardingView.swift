@@ -6,8 +6,11 @@ struct OnboardingView: View {
     let onFinish: () -> Void
 
     @State private var step = 0
+    @State private var interfaceLanguage = AppLocalizer.language
     @State private var microphoneGranted = AudioRecorder.shared.checkMicrophonePermission()
     @State private var accessibilityGranted = HotkeyManager.shared.checkAccessibilityPermission()
+    @State private var didRequestAccessibilityPermission = false
+    @State private var didEnterSystemSettingsFlow = false
     @State private var permissionTimer: Timer?
     @State private var testText = ""
     @State private var didStartTest = false
@@ -15,6 +18,16 @@ struct OnboardingView: View {
     @State private var launchAtLogin = false
     @State private var didLoadLoginSetting = false
     @FocusState private var testFieldFocused: Bool
+
+    private var interfaceLanguageBinding: Binding<InterfaceLanguage> {
+        Binding(
+            get: { interfaceLanguage },
+            set: { language in
+                AppLocalizer.language = language
+                interfaceLanguage = language
+            }
+        )
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
@@ -25,7 +38,7 @@ struct OnboardingView: View {
             if step == 1 {
                 HStack {
                     Spacer()
-                    Button(String(localized: "開始使用 LaSay"), action: finish)
+                    Button(AppLocalizer.string("開始使用 LaSay"), action: finish)
                         .buttonStyle(.borderedProminent)
                         .disabled(!didCompleteTest)
                 }
@@ -33,29 +46,46 @@ struct OnboardingView: View {
         }
         .padding(28)
         .frame(width: 480, height: 400)
+        .id(interfaceLanguage)
         .onAppear {
             AppSettings.shared.setDefaultTranscriptionModeIfNeeded()
             guard !didLoadLoginSetting else { return }
             launchAtLogin = AppSettings.shared.hasLaunchedBefore ? AppSettings.shared.launchAtLogin : true
             didLoadLoginSetting = true
         }
+        .onReceive(NotificationCenter.default.publisher(for: .interfaceLanguageDidChange)) { _ in
+            interfaceLanguage = AppLocalizer.language
+        }
     }
 
     private var permissionsStep: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Label(String(localized: "兩個權限，約一分鐘"), systemImage: "lock.open")
+            HStack {
+                Text(AppLocalizer.string("介面語言"))
+                Spacer()
+                Picker("", selection: interfaceLanguageBinding) {
+                    ForEach(InterfaceLanguage.allCases) { language in
+                        Text(language.displayName).tag(language)
+                    }
+                }
+                .labelsHidden()
+                .frame(width: 170, alignment: .trailing)
+            }
+
+            Label(AppLocalizer.string("兩個權限，約一分鐘"), systemImage: "lock.open")
                 .font(.title2.weight(.semibold))
 
-            Text(String(localized: "LaSay 只在你按住快捷鍵時錄音，並把辨識結果貼到目前的 App。"))
+            Text(AppLocalizer.string("LaSay 只在你按住快捷鍵時錄音，並把辨識結果貼到目前的 App。"))
                 .foregroundStyle(.secondary)
 
             permissionRow(
-                title: String(localized: "麥克風"),
-                detail: String(localized: "用來錄下你說的話"),
+                title: AppLocalizer.string("麥克風"),
+                detail: AppLocalizer.string("用來錄下你說的話"),
                 granted: microphoneGranted,
-                actionTitle: microphoneNeedsSystemSettings ? String(localized: "開啟系統設定") : String(localized: "允許")
+                actionTitle: microphoneNeedsSystemSettings ? AppLocalizer.string("開啟系統設定") : AppLocalizer.string("允許")
             ) {
                 if microphoneNeedsSystemSettings {
+                    didEnterSystemSettingsFlow = true
                     openPrivacySettings("Privacy_Microphone")
                 } else {
                     AudioRecorder.shared.requestMicrophonePermission { granted in
@@ -68,16 +98,23 @@ struct OnboardingView: View {
             Divider()
 
             permissionRow(
-                title: String(localized: "輔助使用"),
-                detail: String(localized: "用來把文字直接輸入目前的 App"),
+                title: AppLocalizer.string("輔助使用"),
+                detail: AppLocalizer.string("先允許 LaSay；若提示未出現，再開啟輔助使用設定。"),
                 granted: accessibilityGranted,
-                actionTitle: String(localized: "開啟系統設定")
+                actionTitle: didRequestAccessibilityPermission
+                    ? AppLocalizer.string("開啟輔助使用設定")
+                    : AppLocalizer.string("允許輔助使用")
             ) {
-                HotkeyManager.shared.requestAccessibilityPermission()
-                openPrivacySettings("Privacy_Accessibility")
+                if didRequestAccessibilityPermission {
+                    didEnterSystemSettingsFlow = true
+                    openPrivacySettings("Privacy_Accessibility")
+                } else {
+                    didRequestAccessibilityPermission = true
+                    HotkeyManager.shared.requestAccessibilityPermission()
+                }
             }
 
-            Text(String(localized: "權限開啟後會自動繼續，不必重新啟動 App。"))
+            Text(AppLocalizer.string("完成後返回 LaSay；權限會自動偵測，不必重新啟動。"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -92,27 +129,31 @@ struct OnboardingView: View {
         actionTitle: String,
         action: @escaping () -> Void
     ) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: granted ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(granted ? Color.green : Color.secondary)
-                .font(.title2)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 12) {
+                Image(systemName: granted ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(granted ? Color.green : Color.secondary)
+                    .font(.title2)
 
-            VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.headline)
-                Text(detail).font(.caption).foregroundStyle(.secondary)
+
+                Spacer()
+
+                if !granted {
+                    Button(actionTitle, action: action)
+                }
             }
 
-            Spacer()
-
-            if !granted {
-                Button(actionTitle, action: action)
-            }
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.leading, 38)
         }
     }
 
     private var testStep: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Label(String(localized: "說一句話，就設定完成"), systemImage: "waveform")
+            Label(AppLocalizer.string("說一句話，就設定完成"), systemImage: "waveform")
                 .font(.title2.weight(.semibold))
 
             Text(testInstruction)
@@ -132,15 +173,15 @@ struct OnboardingView: View {
                 }
 
             if !didCompleteTest {
-                Text(String(localized: "提示：短按不會錄音，請按住、說話、再放開。"))
+                Text(AppLocalizer.string("提示：短按不會錄音，請按住、說話、再放開。"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
-                Label(String(localized: "成功！LaSay 已經可以在任何 App 使用。"), systemImage: "checkmark.circle.fill")
+                Label(AppLocalizer.string("成功！LaSay 已經可以在任何 App 使用。"), systemImage: "checkmark.circle.fill")
                     .foregroundStyle(.green)
             }
 
-            Toggle(String(localized: "登入後自動啟動（推薦）"), isOn: $launchAtLogin)
+            Toggle(AppLocalizer.string("登入後自動啟動（推薦）"), isOn: $launchAtLogin)
         }
         .onReceive(AppState.shared.$status) { status in
             if case .recording = status { didStartTest = true }
@@ -148,7 +189,7 @@ struct OnboardingView: View {
     }
 
     private var testInstruction: String {
-        String(format: String(localized: "點一下文字框，按住 %@ 說話，放開後 LaSay 會把結果貼進來。"), AppSettings.shared.hotkeyPreset.displayName)
+        String(format: AppLocalizer.string("點一下文字框，按住 %@ 說話，放開後 LaSay 會把結果貼進來。"), AppSettings.shared.hotkeyPreset.displayName)
     }
 
     private var microphoneNeedsSystemSettings: Bool {
@@ -179,13 +220,21 @@ struct OnboardingView: View {
     }
 
     private func refreshPermissions() {
+        let wasMicrophoneGranted = microphoneGranted
+        let wasAccessibilityGranted = accessibilityGranted
         microphoneGranted = AudioRecorder.shared.checkMicrophonePermission()
         accessibilityGranted = HotkeyManager.shared.checkAccessibilityPermission()
+
+        let permissionWasGranted = (!wasMicrophoneGranted && microphoneGranted)
+            || (!wasAccessibilityGranted && accessibilityGranted)
+        if permissionWasGranted && (didRequestAccessibilityPermission || didEnterSystemSettingsFlow) {
+            NotificationCenter.default.post(name: NSNotification.Name("FocusOnboarding"), object: nil)
+        }
+
         guard step == 0, microphoneGranted, accessibilityGranted else { return }
 
         stopPermissionPolling()
         step = 1
-        NSApp.activate(ignoringOtherApps: true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { testFieldFocused = true }
     }
 }

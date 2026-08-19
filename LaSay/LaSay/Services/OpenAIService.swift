@@ -17,24 +17,24 @@ enum OpenAIError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .noAPIKey:
-            return String(localized: "API Key 無效 (401)。前往設定更新 Key。")
+            return AppLocalizer.string("API Key 無效 (401)。前往設定更新 Key。")
         case .networkError(let error):
             if let urlError = error as? URLError {
                 if urlError.code == .notConnectedToInternet || urlError.code == .networkConnectionLost {
-                    return String(localized: "網路錯誤：無法連線至 API。檢查網路或切換至本地模式。")
+                    return AppLocalizer.string("網路錯誤：無法連線至 API。檢查網路或切換至本地模式。")
                 } else if urlError.code == .timedOut {
-                    return String(localized: "處理逾時。請重試。")
+                    return AppLocalizer.string("處理逾時。請重試。")
                 }
             }
-            return String(localized: "網路錯誤：無法連線至 API。檢查網路或切換至本地模式。")
+            return AppLocalizer.string("網路錯誤：無法連線至 API。檢查網路或切換至本地模式。")
         case .apiError(let message):
             let lowered = message.lowercased()
             if lowered.contains("api key") || lowered.contains("incorrect api key") || lowered.contains("invalid api key") || lowered.contains("401") || lowered.contains("unauthorized") {
-                return String(localized: "API Key 無效 (401)。前往設定更新 Key。")
+                return AppLocalizer.string("API Key 無效 (401)。前往設定更新 Key。")
             }
-            return String(localized: "API 錯誤：") + message
+            return AppLocalizer.string("API 錯誤：") + message
         case .invalidResponse:
-            return String(localized: "無效的 API 回應")
+            return AppLocalizer.string("無效的 API 回應")
         }
     }
 }
@@ -49,7 +49,7 @@ class OpenAIService {
     private let defaultSystemPrompt = """
     You are a voice-to-text post-processor for software developers. Rules:
     1. Remove filler words (um, uh, 唔, 嗯, 那個, 就是, like, you know)
-    2. Fix grammar and add proper punctuation
+    2. Fix grammar
     3. Preserve ALL technical terms exactly: framework names (React, FastAPI, Kubernetes), language names (Python, TypeScript), tools (Docker, Git), and code identifiers (camelCase, snake_case, PascalCase)
     4. Keep mixed-language input as-is — do NOT translate between languages
     5. Keep the original meaning and tone
@@ -62,7 +62,7 @@ class OpenAIService {
     // MARK: - Polish Text
 
     /// 使用選定的 OpenAI 模型優化文字
-    func polishText(_ text: String, customPrompt: String? = nil, punctuationStyle: PunctuationStyle = .fullWidth, completion: @escaping (Result<String, OpenAIError>) -> Void) {
+    func polishText(_ text: String, customPrompt: String? = nil, completion: @escaping (Result<String, OpenAIError>) -> Void) {
 
         // 檢查 API Key
         guard let apiKey = keychainHelper.get(key: "openai_api_key"), !apiKey.isEmpty else {
@@ -74,17 +74,7 @@ class OpenAIService {
         let trimmedPrompt = customPrompt?.trimmingCharacters(in: .whitespacesAndNewlines)
         let basePrompt = (trimmedPrompt?.isEmpty == false ? trimmedPrompt : defaultSystemPrompt) ?? defaultSystemPrompt
         
-        // 加入標點符號風格指令
-        let punctuationInstruction: String
-        switch punctuationStyle {
-        case .fullWidth:
-            punctuationInstruction = "\n7. Use full-width punctuation for Chinese text (，。！？：；「」（）、)"
-        case .halfWidth:
-            punctuationInstruction = "\n7. Use half-width punctuation for Chinese text (,.!?:;\"())"
-        case .spaces:
-            punctuationInstruction = "\n7. Use spaces instead of punctuation between Chinese clauses"
-        }
-        let systemPrompt = basePrompt + punctuationInstruction
+        let systemPrompt = basePrompt
 
         // 建立請求
         var request = URLRequest(url: URL(string: apiURL)!)

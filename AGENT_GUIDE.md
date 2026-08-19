@@ -16,7 +16,7 @@ For updates, run `brew upgrade --cask lasay`. A DMG is also available from the G
 
 LaSay must receive two one-time macOS permissions: **Microphone** to record speech and **Accessibility** to write text into the active text field. macOS requires the person at the keyboard to approve them. Do not describe Accessibility as optional.
 
-After both permissions are granted, LaSay opens a test field. Have the user click it, hold **Fn + Space**, speak, then release. Setup is complete only when generated text appears in that field. If a permission was denied earlier, choose **Run Setup Again…** from the LaSay menu-bar menu; the app opens the relevant System Settings page.
+After both permissions are granted, LaSay returns to the foreground and opens a test field. Have the user click it, hold **Fn + Space**, speak, then release. Setup is complete only when generated text appears in that field. If a permission was denied earlier, choose **Run Setup Again…** from the LaSay menu-bar menu. Select **Allow Accessibility** first; use **Open Accessibility Settings** only if macOS does not show its prompt.
 
 ## Everyday use and settings
 
@@ -24,7 +24,7 @@ Hold **Fn + Space** in any editable field, speak, and release. Direct input at t
 
 Open **Settings…** from LaSay's menu-bar icon, or open LaSay from Applications again. Local SenseVoice transcription is the default, free, and stays on-device. OpenAI cloud transcription and AI Polish require the user's own API key; those enabled features send the relevant audio or text to OpenAI.
 
-Do not replace files inside `/Applications/LaSay.app`: that breaks the app signature and will be overwritten by updates. To change the bundled recognizer, fork the source, retain model license notices, and build/test the fork.
+Do not replace files inside `/Applications/LaSay.app`: that breaks the app signature and will be overwritten by updates. Normal Homebrew or DMG updates do not require removing LaSay from Accessibility first. Keep the `/Applications/LaSay.app` permission entry; remove only duplicate entries from Debug or backup copies when cleaning a development machine. To change the bundled recognizer, fork the source, retain model license notices, and build/test the fork.
 
 ## Troubleshooting and contributions
 

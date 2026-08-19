@@ -15,6 +15,12 @@
             "state" : "translated",
             "value" : "LaSay 需要麥克風權限，才能錄下你的語音並轉成文字。"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LaSay 需要麦克风权限，才能录下你的语音并转成文字。"
+          }
         }
       }
     }

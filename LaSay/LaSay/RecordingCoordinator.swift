@@ -94,8 +94,8 @@ final class RecordingCoordinator {
             AppLogger.recording.info("Recording too short: \(duration, privacy: .public)s, deleting")
             try? FileManager.default.removeItem(at: audioURL)
             showNotification(
-                title: String(localized: "錄音太短"),
-                body: String(format: String(localized: "請按住 %@ 說話，放開後自動辨識"), AppSettings.shared.hotkeyPreset.displayName)
+                title: AppLocalizer.string("錄音太短"),
+                body: String(format: AppLocalizer.string("請按住 %@ 說話，放開後自動辨識"), AppSettings.shared.hotkeyPreset.displayName)
             )
             appState.updateStatus(.idle)
             hotkeyManager.restartMonitoring()
@@ -109,8 +109,8 @@ final class RecordingCoordinator {
             AppLogger.transcription.error("RecordingCoordinator: processing timeout reached")
             DispatchQueue.main.async {
                 self.showNotification(
-                    title: String(localized: "語音轉錄失敗"),
-                    body: String(localized: "處理逾時。請重試。"),
+                    title: AppLocalizer.string("語音轉錄失敗"),
+                    body: AppLocalizer.string("處理逾時。請重試。"),
                     isError: true
                 )
                 self.appState.updateStatus(.idle)
@@ -120,8 +120,6 @@ final class RecordingCoordinator {
         }
 
         let selectedMode = AppSettings.shared.transcriptionMode
-        let selectedLanguage = AppSettings.shared.transcriptionLanguage
-        let languageCode = selectedLanguage.languageCode
 
         if selectedMode == .cloud {
             guard KeychainHelper.shared.get(key: "openai_api_key")?.isEmpty == false else {
@@ -131,8 +129,8 @@ final class RecordingCoordinator {
                     self.processingTimer = nil
                     NotificationCenter.default.post(name: NSNotification.Name("OpenSettings"), object: nil)
                     self.showNotification(
-                        title: String(localized: "需要 API Key"),
-                        body: String(localized: "請在設定中輸入 OpenAI API Key 以使用雲端模式"),
+                        title: AppLocalizer.string("需要 API Key"),
+                        body: AppLocalizer.string("請在設定中輸入 OpenAI API Key 以使用雲端模式"),
                         isError: true
                     )
                     self.appState.updateStatus(.idle)
@@ -152,7 +150,7 @@ final class RecordingCoordinator {
                 switch result {
                 case .success(let rawText):
                     AppLogger.transcription.info("RecordingCoordinator: transcription succeeded")
-                    let transcribedText = self.convertToTraditionalChinese(rawText)
+                    let transcribedText = rawText
                     let enableAIPolish = AppSettings.shared.enableAIPolish
 
                     // Delete recording immediately — text is already in memory
@@ -166,10 +164,8 @@ final class RecordingCoordinator {
 
                         AppLogger.transcription.info("RecordingCoordinator: AI Polish started")
                         let customPrompt = AppSettings.shared.customSystemPrompt
-                        // Cloud 模式固定全形標點，不額外加指令拖慢 AI Polish
-                        let puncStyle: PunctuationStyle = (selectedMode == .cloud) ? .fullWidth : AppSettings.shared.punctuationStyle
 
-                        self.polishTextWithRetry(transcribedText, customPrompt: customPrompt, punctuationStyle: puncStyle) { [weak self] finalText in
+                        self.polishTextWithRetry(transcribedText, customPrompt: customPrompt) { [weak self] finalText in
                             self?.processFinalText(finalText)
                         }
                     } else {
@@ -182,7 +178,7 @@ final class RecordingCoordinator {
                     self.processingTimer = nil
 
                     self.showNotification(
-                        title: String(localized: "語音轉錄失敗"),
+                        title: AppLocalizer.string("語音轉錄失敗"),
                         body: error.localizedDescription,
                         isError: true
                     )
@@ -204,15 +200,11 @@ final class RecordingCoordinator {
                 completion: transcriptionHandler
             )
         case .cloud:
-            cloudService.transcribe(audioFileURL: audioURL, language: languageCode, completion: transcriptionHandler)
+            cloudService.transcribe(audioFileURL: audioURL, completion: transcriptionHandler)
         }
     }
 
     // MARK: - Text Processing
-    
-    private func convertToTraditionalChinese(_ text: String) -> String {
-        return text.applyingTransform(StringTransform("Hans-Hant"), reverse: false) ?? text
-    }
 
     private func processFinalText(_ text: String) {
         DispatchQueue.main.async { [weak self] in
@@ -225,14 +217,17 @@ final class RecordingCoordinator {
                 // TechTermsDictionary only for offline mode — AI Polish handles this contextually
                 let enableAIPolish = AppSettings.shared.enableAIPolish
                 let techCorrected = enableAIPolish ? text : TechTermsDictionary.apply(to: text)
-                let style = AppSettings.shared.punctuationStyle
-                return PunctuationConverter.convert(techCorrected, to: style)
+                let scriptAdjusted = ChineseOutputConverter.convert(
+                    techCorrected,
+                    to: AppSettings.shared.chineseOutputScript
+                )
+                return scriptAdjusted
             }()
             self.textInputService.pasteText(correctedText, restoreClipboard: AppSettings.shared.restoreClipboard) { [weak self] didAutoPaste in
                 guard let self, !didAutoPaste else { return }
                 self.showNotification(
-                    title: String(localized: "文字已複製"),
-                    body: String(localized: "已複製文字，請按 Command-V 貼上")
+                    title: AppLocalizer.string("文字已複製"),
+                    body: AppLocalizer.string("已複製文字，請按 Command-V 貼上")
                 )
             }
 
@@ -246,12 +241,11 @@ final class RecordingCoordinator {
     private func polishTextWithRetry(
         _ text: String,
         customPrompt: String?,
-        punctuationStyle: PunctuationStyle,
         maxRetries: Int = 1,
         attempt: Int = 0,
         completion: @escaping (String) -> Void
     ) {
-        openAIService.polishText(text, customPrompt: customPrompt, punctuationStyle: punctuationStyle) { [weak self] result in
+        openAIService.polishText(text, customPrompt: customPrompt) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 switch result {
@@ -261,12 +255,12 @@ final class RecordingCoordinator {
                 case .failure(let error):
                     if attempt < maxRetries {
                         AppLogger.transcription.warning("AI Polish retry \(attempt + 1)/\(maxRetries): \(error.localizedDescription)")
-                        self.polishTextWithRetry(text, customPrompt: customPrompt, punctuationStyle: punctuationStyle, maxRetries: maxRetries, attempt: attempt + 1, completion: completion)
+                        self.polishTextWithRetry(text, customPrompt: customPrompt, maxRetries: maxRetries, attempt: attempt + 1, completion: completion)
                     } else {
                         AppLogger.transcription.error("AI Polish failed after \(maxRetries + 1) attempts: \(error.localizedDescription)")
                         self.showNotification(
-                            title: String(localized: "AI 潤飾失敗"),
-                            body: String(localized: "已使用原始轉錄文字：") + error.localizedDescription,
+                            title: AppLocalizer.string("AI 潤飾失敗"),
+                            body: AppLocalizer.string("已使用原始轉錄文字：") + error.localizedDescription,
                             isError: false
                         )
                         completion(text) // fallback to original
@@ -292,7 +286,7 @@ final class RecordingCoordinator {
                 self.processingTimer?.invalidate()
                 self.processingTimer = nil
                 self.showNotification(
-                    title: String(localized: "語音轉錄失敗"),
+                    title: AppLocalizer.string("語音轉錄失敗"),
                     body: error.localizedDescription,
                     isError: true
                 )
