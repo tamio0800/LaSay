@@ -55,6 +55,9 @@ xcodebuild -exportArchive \
 app="$export_path/LaSay.app"
 [[ -d "$app" ]] || fail "exported app is missing: $app"
 codesign --verify --deep --strict --verbose=2 "$app"
+if codesign -d --entitlements :- "$app" 2>/dev/null | grep -q '<key>com.apple.security.app-sandbox</key>'; then
+  fail 'LaSay cannot be sandboxed because it requires Accessibility for direct input'
+fi
 
 version="$(defaults read "$app/Contents/Info" CFBundleShortVersionString)"
 build="$(defaults read "$app/Contents/Info" CFBundleVersion)"
